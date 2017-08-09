@@ -1,0 +1,187 @@
+<?php
+
+/* 
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
+
+function ctools_custom_modal_menu() {
+  $items = array();
+  $items['modal_display/node/%ctools_js/%'] = array(
+    'page callback' => 'ctools_modal_node_display',
+    'page arguments' => array(2,3),
+    'access arguments' => array('access content'),
+  );  
+  $items['modal_display/form/%ctools_js/%/%'] = array(
+    'page callback' => 'ctools_modal_form_display',
+    'page arguments' => array(2,3,4),
+    'access arguments' => array('access content'),
+  );
+  
+  return $items;
+}
+
+/**
+ * Implements hook_block_info().
+ */
+function ctools_custom_modal_block_info() {
+  $blocks = array();
+  $blocks['custom_form_modal_settings_block'] = array(
+    'info' => t('Ctools modal settings for forms block'),
+  );
+  $blocks['custom_node_modal_settings_block'] = array(
+    'info' => t('Ctools modal settings for nodes block'),
+  );
+  return $blocks;
+}
+
+/**
+* Implements hook_block_view().
+*/
+function ctools_custom_modal_block_view($delta) {
+  $block = array();
+  switch ($delta) {
+    case 'custom_form_modal_settings_block':
+      $block['subject'] = '';
+      $block['content'] = _custom_form_modal_settings_block();
+      break;
+    case 'custom_node_modal_settings_block':
+      $block['subject'] = '';
+      $block['content'] = _custom_node_modal_settings_block();
+      break;
+  }
+  return $block;
+}
+
+function _custom_form_modal_settings_block() {
+  // Include the CTools tools that we need.
+  ctools_include('ajax');
+  ctools_include('modal');
+
+  // Add CTools' javascript to the page.
+  ctools_modal_add_js();
+
+  // Create our own javascript that will be used to theme a modal.
+  $sample_style = array(
+    'ctools-custom-form-style' => array(
+      'modalSize' => array(
+        'type' => 'fixed',
+       'width' => 800,
+       'height' => 400,
+        'addWidth' => 20,
+        'addHeight' => 15,
+      ),
+      'modalOptions' => array(
+        'opacity' => .5,
+        'background-color' => '#000',
+      ),
+      'animation' => 'fadeIn',
+      'modalTheme' => 'CToolsCustomFormModalDialog',
+      'throbber' => theme('image', array('path' => ctools_image_path('ajax-loader.gif', 'ctools_ajax_sample'), 'alt' => t('Loading...'), 'title' => t('Loading'))),
+    ),
+  );
+
+  drupal_add_js($sample_style, 'setting');
+  //drupal_add_js(array('CToolsModalCustom' => array('closeBtn' => base_path().drupal_get_path('module', 'ctools').'/images/icon-close-window.png')), 'setting');
+  
+  // Since we have our js, css and images in well-known named directories,
+  // CTools makes it easy for us to just use them without worrying about
+  ctools_add_js('ctools_custom_form_modal', 'ctools_custom_modal');
+  ctools_add_css('ctools_custom_modal', 'ctools_custom_modal');
+}
+
+function _custom_node_modal_settings_block() {
+  // Include the CTools tools that we need.
+  ctools_include('ajax');
+  ctools_include('modal');
+
+  // Add CTools' javascript to the page.
+  ctools_modal_add_js();
+
+  // Create our own javascript that will be used to theme a modal.
+  $sample_style = array(
+    'ctools-custom-style' => array(
+      'modalSize' => array(
+        'type' => 'fixed',
+        'width' => 500,
+        'height' => 300,
+        'addWidth' => 20,
+        'addHeight' => 15,
+      ),
+      'modalOptions' => array(
+        'opacity' => .5,
+        'background-color' => '#000',
+      ),
+      'animation' => 'fadeIn',
+      'modalTheme' => 'CToolsCustomModalDialog',
+      'throbber' => theme('image', array('path' => ctools_image_path('ajax-loader.gif', 'ctools_ajax_sample'), 'alt' => t('Loading...'), 'title' => t('Loading'))),
+    ),
+  );
+
+  drupal_add_js($sample_style, 'setting');
+  //drupal_add_js(array('CToolsModalCustom' => array('closeBtn' => base_path().drupal_get_path('module', 'ctools').'/images/icon-close-window.png')), 'setting');
+  
+  // Since we have our js, css and images in well-known named directories,
+  // CTools makes it easy for us to just use them without worrying about
+  ctools_add_js('ctools_custom_modal', 'ctools_custom_modal');
+  ctools_add_css('ctools_custom_modal', 'ctools_custom_modal');
+}
+
+function ctools_modal_node_display($js = FALSE, $nid) {
+  if ($js) {    
+    ctools_include('ajax');
+    ctools_include('modal');
+  }
+  if (!empty($nid)) {
+    if (is_numeric($nid)) {
+      $node = node_load($nid);
+    } else {
+      $path = drupal_lookup_path('source', $nid);
+      $node = menu_get_object('node', 1, $path);
+    }
+
+    $title = $node->title;
+    // Shows full node view for Demo items.
+    // Either Videos or PDFs.
+    if (isset($node) && ($node->type == "demo" || $node->type == "edutainment" || $node->type == "branches" || $node->type == "forms_and_software")) {      // Loads full view node.
+      $node = node_view($node, 'full');
+      // Renders node.
+      $content = drupal_render($node);
+      // Make proper node theme.
+      $data = theme('node', $node);
+    }
+    else {
+      $data = '<div class="inner-popup">'.$node->body['und'][0]['value'];
+    }
+    $link = l('Close', '', array('attributes' => array('class' => 'ctools-close-modal close-btn')));
+    $data .= '</div><div class="close-container">'.$link.'</div>';
+    $data .= '<script type="text/javascript">setTimeout(function(){ jQuery(".inner-popup").scrollTop(0); }, 500);</script>';
+    ctools_modal_render($title, $data);
+  }
+}
+
+function ctools_modal_form_display($js = FALSE, $form_id, $form_name) {
+  if ($js) {    
+    ctools_include('ajax');
+    ctools_include('modal');    
+    $form_state = array(
+      'ajax' => TRUE,
+      'title' => urldecode($form_name),
+    );
+  }
+  if (!empty($form_id)) {
+    $output = ctools_modal_form_wrapper($form_id, $form_state);
+    if (!empty($form_state['executed'])) {      
+      if (!empty($form_state['redirect'])) {
+        $output = array();
+        $output[] = ctools_ajax_command_redirect($form_state['redirect']);
+        $output[] = ctools_modal_command_dismiss();
+      } else {
+        $output = ctools_modal_form_render($form_state, $output);
+      }      
+    }
+    print ajax_render($output);
+  }
+}
+

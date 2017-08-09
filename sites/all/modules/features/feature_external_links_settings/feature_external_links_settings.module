@@ -1,0 +1,7 @@
+<?php
+/**
+ * @file
+ * Code for the Feature external links settings feature.
+ */
+
+include_once 'feature_external_links_settings.features.inc';

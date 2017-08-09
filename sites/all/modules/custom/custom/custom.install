@@ -1,0 +1,8 @@
+<?php
+
+/**
+ * Updates entire permissions to the system.
+ */
+function custom_update_7001() {
+  features_revert_module("feature_permissions");
+}

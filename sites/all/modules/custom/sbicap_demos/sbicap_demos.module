@@ -1,0 +1,80 @@
+<?php
+
+/**
+ * @file
+ * Demo related functionalities.
+ */
+/**
+ * Implements hook_block_info().
+ */
+function sbicap_demos_block_info() {
+  $blocks = array();
+  $blocks['education_demos'] = array(
+    'info' => t('Education Demos'),
+    'visibility' => BLOCK_VISIBILITY_LISTED,
+    'pages' => 'education/demo',
+    'region' => 'content',
+  );  
+  return $blocks;
+}
+
+/**
+ * Implements hook_block_view().
+ */
+function sbicap_demos_block_view($delta = '') {
+  $block = array();
+
+  switch ($delta) {
+    case 'education_demos':
+      $block['content'] = theme('get_sbicap_demo_content');
+      break;
+  }
+  return $block;
+}
+
+/**
+ * Implements hook_theme().
+ */
+function sbicap_demos_theme($existing, $type, $theme, $path) {
+  global $base_url;
+  if (drupal_match_path(drupal_get_path_alias(), 'education/demo')) {
+    
+  }
+  $module_path = $base_url . '/' . drupal_get_path('module', 'sbicap_demos');
+  return array(
+    'get_sbicap_demo_content' => array(
+      'variables' => array(),
+      'template' => 'theme/education-demo'
+    ),
+  );
+}
+
+/**
+ * Implements hook_menu().
+ */
+function sbicap_demos_menu() {
+  $items['ajax-demos/%'] = array(
+    'title' => 'Demos content',
+    'type' => MENU_CALLBACK,
+    'page callback' => 'ajax_demos_callback',
+    'page arguments' => array(1),
+    'access arguments' => array('access content'),
+  );
+  return $items;
+}
+
+/**
+ * Custom ajax callback for demos.
+ * @param Int $nid
+ */
+function ajax_demos_callback($nid) {
+  // Loads specific node.
+  $node = node_load($nid);
+  // Loads full view node.
+  $node = node_view($node, 'full');
+  // Renders node.
+  $content = drupal_render($node);
+  // Make proper node theme.
+  $content = theme('node', $node);
+  print $content;
+}

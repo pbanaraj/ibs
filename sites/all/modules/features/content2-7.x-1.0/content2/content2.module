@@ -1,0 +1,7 @@
+<?php
+/**
+ * @file
+ * Code for the content2 feature.
+ */
+
+include_once 'content2.features.inc';

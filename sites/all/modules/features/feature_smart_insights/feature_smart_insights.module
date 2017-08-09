@@ -1,0 +1,7 @@
+<?php
+/**
+ * @file
+ * Code for the Feature Smart Insights feature.
+ */
+
+include_once 'feature_smart_insights.features.inc';

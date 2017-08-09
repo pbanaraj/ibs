@@ -1,0 +1,7 @@
+<?php
+/**
+ * @file
+ * Code for the SBI Notifications feature.
+ */
+
+include_once 'feature_sbi_notifications.features.inc';

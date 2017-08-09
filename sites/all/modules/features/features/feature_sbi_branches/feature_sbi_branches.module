@@ -1,0 +1,7 @@
+<?php
+/**
+ * @file
+ * Code for the Feature SBI Branches feature.
+ */
+
+include_once 'feature_sbi_branches.features.inc';

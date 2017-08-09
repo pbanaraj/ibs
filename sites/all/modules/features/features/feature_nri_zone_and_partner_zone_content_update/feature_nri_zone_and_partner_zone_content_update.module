@@ -1,0 +1,7 @@
+<?php
+/**
+ * @file
+ * Code for the Feature NRI Zone and Partner Zone content update feature.
+ */
+
+include_once 'feature_nri_zone_and_partner_zone_content_update.features.inc';

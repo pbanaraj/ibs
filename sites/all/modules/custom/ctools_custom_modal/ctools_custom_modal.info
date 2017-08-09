@@ -1,0 +1,6 @@
+name = CTOOLS Custom Modal
+description = Custom module for CTOOLS modal window customization. 
+package = CUSTOM
+core = 7.x
+dependencies[] = ctools
+

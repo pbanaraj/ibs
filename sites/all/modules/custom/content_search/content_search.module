@@ -1,0 +1,409 @@
+<?php
+
+/**
+ * Implements hook_help().
+ */
+function content_search_taxonomy_help($path, $arg) {
+  switch ($path) {
+    case 'admin/config/search/settings/taxonomy':
+      $output = t('Configuring the filters for content search.');
+      break;
+  }
+  return $output;
+}
+
+function content_search_permission() {
+  return array(
+    'administer content search' => array(
+      'title' => t('Administer content search'),
+      'description' => t('Perform administration configurations for content search.'),
+    ),
+  );
+}
+
+/**
+ * Implements hook_menu().
+ */
+function content_search_menu() {
+  $items['content_search/autocomplete/%/%'] = array(
+    'page callback' => '_autocomplete_results',
+    'access arguments' => array('access content'),
+    'page arguments' => array(2,3),
+    'type' => MENU_CALLBACK
+  );
+  $items['custom/search_autocomplete_callback/%/%'] = array(
+    'page callback' => 'search_autocomplete_callback',
+    'page arguments' => array(2, 3),
+    'access arguments' => array('access content'),
+    'type' => MENU_CALLBACK,
+  );
+  $items['admin/config/search/filters'] = array(
+    'title' => 'Custom Search Filters',
+    'description' => 'Configures filters for search.',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('content_search_filters_admin'),
+    'access arguments' => array('administer content search'),
+    'file' => 'content_search_filters.admin.inc',
+    'type' => MENU_NORMAL_ITEM,
+    'weight' => 2,
+  );
+  return $items;
+}
+
+/**
+ * Custom function to retrieve search result in autocomplete.
+ * @param int $nid
+ * @param string $request_path
+ * @param string $string
+ */
+function search_autocomplete_callback($nid, $request_path, $string = "") {
+  if ($string) {
+    $matches = array();
+    $conditions = NULL;
+    // Search API to get result data object.
+    $search_data = search_data($string, 'node', $conditions);
+    $search_result = $search_data['#results'];
+
+    // Get taxonomy term select options to make use of content filter.
+    $voc_inner_search_master = variable_get('content_search_inner_search_master_selector');
+    $remove = array(0);
+    $term_result = array_diff($voc_inner_search_master, $remove);
+
+    if (count($search_result) > 0) {
+      if (isset($nid)) {
+        $page_visited_node_obj = node_load($nid);
+      }
+      if ($page_visited_node_obj->type == 'education') {
+        // Get content type.
+        $content_type_flag = _get_content_type($page_visited_node_obj);
+        $matches = _get_indexed_result($content_type_flag, $search_result, array());
+      }
+      if ($request_path == 'customer-service') {
+        $matches = _get_indexed_result('customer-service', $search_result, $term_result);
+      }
+      if ($request_path == 'faq') {
+        $matches = _get_indexed_result('faq', $search_result, array());
+      }
+      if ($request_path == 'download') {
+        $matches = _get_indexed_result('download', $search_result, array());
+      }
+    }
+    else {
+      // Unsets the error "You must include at least one positive keyword with 3 characters or more.".
+      // As per the requirement this error is not neccessary.
+      unset($_SESSION['messages']['error']);
+    }
+    drupal_json_output($matches);
+  }
+}
+
+/**
+ * Implements hook_form().
+ */
+function content_search_form() {
+  $form = array();
+  $nid=0;
+  $node = menu_get_object();
+  if($node) {
+      $nid = $node->nid;
+  }
+  /* code added for modal popup */
+  ctools_include('ajax');
+  ctools_include('modal');
+
+  // Add CTools' javascript to the page.
+  ctools_modal_add_js();
+
+  // Create our own javascript that will be used to theme a modal.
+  $modal_style = array(
+    'ctools-custom-style' => array(
+      'modalSize' => array(
+        'type' => 'fixed',
+        'width' => 600,
+        'height' => 300,
+        'addWidth' => 20,
+        'addHeight' => 15,
+      ),
+      'modalOptions' => array(
+        'opacity' => .5,
+        'background-color' => '#000',
+      ),
+      'animation' => 'fadeIn',
+      'modalTheme' => 'CToolsCustomModalDialog',
+      'throbber' => theme('image', array('path' => ctools_image_path('ajax-loader.gif', 'ctools_ajax_sample'), 'alt' => t('Loading...'), 'title' => t('Loading'))),
+    ),
+  );
+
+  drupal_add_js($modal_style, 'setting');
+  
+  // Since we have our js, css and images in well-known named directories,
+  // CTools makes it easy for us to just use them without worrying about
+  // using drupal_get_path() and all that ugliness. 
+  ctools_add_js('ctools_custom_modal', 'ctools_custom_modal');
+  ctools_add_css('ctools_custom_modal', 'ctools_custom_modal');
+  /* modal popup ends */
+  $request_path = request_path();
+
+  if ($request_path == 'faq') {
+    $request_path = 'faq';
+  }
+  elseif ($request_path == 'download') {
+    $request_path = 'download';
+  }
+  else {
+    $request_path =  ($request_path == 'customer-service') ? $request_path : 'no';
+  }
+  $form['content_search'] = array(
+    '#type' => 'textfield',
+    '#autocomplete_path' => 'custom/search_autocomplete_callback/' . $nid . '/' . $request_path,
+    '#attributes'=>array('class'=>array('pageSearch-control'),'placeholder'=>'Search')
+  );
+  /*$form['submit'] = array(
+    '#type' => 'submit',
+    '#attributes'=>array('class'=>array('search-icon')),
+    '#value' => '',
+  );*/
+  return $form;
+}
+
+/**
+* Implements hook_block_info().
+*/
+function content_search_block_info() {
+  $blocks = array();
+  $blocks['CONTENT_SEARCH_BLOCK'] = array(
+    'info' => t('Content Search'),
+    'status' => TRUE,
+    'visibility' => BLOCK_VISIBILITY_PHP, 
+    'region' => 'content_search',
+  );
+  return $blocks;
+}
+
+/**
+* Implements hook_block_view().
+*/
+function content_search_block_view($delta = '') {
+  $block = array();
+  switch ($delta) {
+    case 'CONTENT_SEARCH_BLOCK':
+      $block['subject'] = '';
+      $block['content'] = theme('content_search_template',array('data'=>NULL));
+      break;
+  }
+  return $block;
+}
+
+/**
+ * Implements hook_theme().
+ */
+function content_search_theme($existing, $type, $theme, $path) {
+  $theme = array();
+  $theme['content_search_template'] = array(
+    'template' => 'content_search',
+    'render element' => 'form',
+    'path' => drupal_get_path('module', 'content_search') . '/templates',
+    'arguments' => array('data' => null),
+   );
+  return $theme;
+}
+
+/**
+ * Function to get the search results with formatted input.
+ */
+function _autocomplete_results($nodeid, $request_path, $string) {
+  $content_types = array();
+  if(isset($nodeid)) {
+    // Loads node object.
+    $nodeobj = node_load($nodeid);
+    if($nodeobj->type=="education") {
+      // Term id from Education content.
+      $education_termid = $nodeobj->field_education_cateogry[LANGUAGE_NONE][0]['tid'];
+      // Loads term based on term id.
+      $term = taxonomy_term_load($education_termid);
+      // Term name.
+      $term_name = $term->name;
+      // Sets content type based on term id.
+      switch ($term_name) {
+        case 'Learning Room':
+          $content_types[] = 'learning_room';
+          break;
+        case 'Tools & Calculators':
+          $content_types[] = 'tools';
+          break;
+        case 'Webinars':
+          $content_types[] = 'webinars';
+          break;
+        case 'Expert Talks':
+          $content_types[] = 'expert_talk';
+          break;
+        case 'Smart Insight':
+          $content_types[] = 'smart_insights';
+          break;
+        case 'Demo':
+          $content_types[] = 'demo';
+          break;
+        case 'Smart Edutainment':
+          $content_types[] = 'edutainment';
+          break;
+        default:
+          $content_types = array();
+          break;
+      }
+    }
+    else {
+      // If node is other than education type, will pass empty $content_types.
+      // This results all the nodes title in the autocomplete.
+      // Eg. Customer service pages searches all nodes title.
+      // $content_types = array();
+      // Only for customer service page.
+      if ($request_path == "customer-service") {
+        // Fetches distinct content types from serveral nodes.
+        $content_types = _get_distinct_content_types();
+      }
+    }
+    // Calls function to retrieve matches items.
+    $matches = _node_titles_autocomplete_callback($string, $content_types);
+    drupal_json_output($matches);
+  }
+}
+
+/**
+ * Custom function for autocomplete callback to fetch matching items.
+ * @param String $string
+ * @param Array $content_types
+ * @return Array
+ */
+function _node_titles_autocomplete_callback($string, $content_types) {
+  $matches = array();
+  if ($string) {
+    $query = db_select('node')
+      ->fields('node', array('nid', 'title'))
+      ->condition('title', db_like($string) . '%', 'LIKE');
+    $content_types_count = count($content_types);
+    // Adds content type check when it is available.
+    if ($content_types_count > 0) {
+      $query->condition('type', $content_types, 'IN');
+    }
+
+    $result = $query->range(0, 10)->execute()->fetchAll();
+    // Loops through each node.
+    foreach ($result as $node) {
+      $node_title = $node->title;
+      // Collects node titles.
+      // To make use of dropdown.
+      $matches[$node->nid] = check_plain($node_title);
+    }
+  }
+  return $matches;
+}
+
+/**
+ * Custom function to get distinct content types.
+ */
+function _get_distinct_content_types() {
+  $content_types = array();
+  // Finding tid from Inner Search master vocabulary.
+  $tids = taxonomy_get_term_by_name('Customer Service','inner_search_master');
+  if (count($tids) > 0) {
+    // Finding nids from all available tid.
+    $nids = taxonomy_select_nodes(array_keys($tids), $pager = FALSE, $limit = FALSE, $order = array('t.sticky' => 'DESC', 't.created' => 'DESC'));
+    if (isset($nids)) {
+      $query = db_select('node', 'n')
+        ->distinct()
+        ->fields('n',array('type'))
+        ->condition('n.nid',$nids,'IN');
+      $response = $query->execute();
+      $result = $response->fetchAll();
+      foreach($result as $res) {
+        $content_types[] = $res->type;
+      }
+    }
+  }
+  return $content_types;
+}
+
+/**
+ * Custom function to get content type.
+ */
+function _get_content_type($nodeobj) {
+    // Term id from Education content.
+    $education_termid = $nodeobj->field_education_cateogry[LANGUAGE_NONE][0]['tid'];
+    // Loads term based on term id.
+    $term = taxonomy_term_load($education_termid);
+    // Term name.
+    $term_name = $term->name;
+    // Sets content type based on term id.
+    switch ($term_name) {
+      case 'Learning Room':
+        $content_type = 'learning_room';
+        break;
+      case 'Tools & Calculators':
+        $content_type = 'tools';
+        break;
+      case 'Webinars':
+        $content_type = 'webinars';
+        break;
+      case 'Expert Talks':
+        $content_type = 'expert_talk';
+        break;
+      case 'Smart Insight':
+        $content_type = 'smart_insights';
+        break;
+      case 'Demo':
+        $content_type = 'demo';
+        break;
+      case 'Smart Edutainment':
+        $content_type = 'edutainment';
+        break;
+      default:
+        $content_type = '';
+        break;
+    }
+  return $content_type;
+}
+
+/**
+ * Custom function to get indexed items.
+ */
+function _get_indexed_result($flag, $search_result, $term_result) {
+  $matches = array();
+  if ($flag == 'customer-service') {
+    foreach ($search_result as $key => $node) {
+      $termid = $node['node']->field_inner_search_category[LANGUAGE_NONE][0]['tid'];
+      // Result will come when it has associated with Customer Sevice term,
+      //   under Inner Search Category.
+      if (isset($termid) && in_array($termid, $term_result)) {
+        $node_title = $node['node']->title;
+        $matches[$node['node']->nid] = check_plain($node_title);
+      }
+    }
+  }
+  elseif ($flag == 'faq') {
+    foreach ($search_result as $key => $node) {
+      if ($node['node']->type == 'faq') {
+        $node_title = $node['node']->title;
+        $matches[$node['node']->nid] = check_plain($node_title);
+      }
+    }
+  }
+  elseif ($flag == 'download') {
+    foreach ($search_result as $key => $node) {
+      if ($node['node']->type == 'forms_and_software') {
+        $node_title = $node['node']->title;
+        $matches[$node['node']->nid] = check_plain($node_title);
+      }
+    }
+  }
+  else {
+    foreach ($search_result as $key => $node) {
+      // Result will come when it has associated with Learning room, Smart insight, etc.,
+      $education_flag = (isset($flag) && $flag == $node['node']->type);
+      if ($education_flag) {
+        $node_title = $node['node']->title;
+        $matches[$node['node']->nid] = check_plain($node_title);
+      }
+    }
+  }
+  return $matches;
+}

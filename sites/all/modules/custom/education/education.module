@@ -1,0 +1,218 @@
+<?php /**
+* Implements hook_menu().
+*/
+function education_menu() {
+  $items['education'] = array(
+    'page callback' => 'education_callback',
+    'access arguments' => array('access content'),
+    'type' => MENU_CALLBACK
+  );
+  $items['ajax-content/%'] = array(
+    'title' => 'Tools content',
+    'type' => MENU_CALLBACK,
+    'page callback' => 'ajax_content_callback',
+    'page arguments' => array(1),
+    'access arguments' => array('access content'),
+  );
+  $items['update-statistics'] = array(
+    'title' => 'Page visits statistics update',
+    'type' => MENU_CALLBACK,
+    'page callback' => 'update_statistics_callback',
+    'access arguments' => array('access content'),
+  );
+  return $items;
+}
+
+/**
+ * Custom ajax callback for tools.
+ * @param Int $nid
+ */
+function ajax_content_callback($nid) {
+  // Loads specific node.
+  $node = node_load($nid);
+  // Loads full view node.
+  $node = node_view($node, 'full');
+  // Renders node.
+  $content = drupal_render($node);
+  // Make proper node theme.
+  $content = theme('node', $node);
+  print $content;
+}
+
+function education_callback() {
+  return theme('education_page',array('data'=>NULL));
+}
+
+/**
+ * Implements hook_theme().
+ */
+function education_theme($existing, $type, $theme, $path) {
+  $theme = array();
+  $theme['education_page'] = array(
+    'template' => 'base_education',
+    'path' => drupal_get_path('module', 'education') . '/templates',
+   );
+  $theme['Education_sub_category_template'] = array(
+    'template' => 'education_sub_category',
+    'path' => drupal_get_path('module', 'education') . '/templates',
+    'variables' => array('terms' => NULL),
+   );
+  return $theme;
+}
+
+/**
+* Implements hook_block_info().
+*/
+function education_block_info() {
+  $blocks = array();
+  $blocks['EDUCATION_SUB_CATEGORY_BLOCK'] = array(
+    'info' => t('Education sub category block'),
+    'status' => TRUE,
+    'visibility' => BLOCK_VISIBILITY_LISTED,
+    'region' => 'content',
+    'pages'=>'education/learning-room '
+      . 'education/smart-insight',
+  );
+  return $blocks;
+}
+
+/**
+ * Implements hook_block_view().
+ */
+function education_block_view($delta = '') {
+  $block = array();
+  switch ($delta) {
+    case 'EDUCATION_SUB_CATEGORY_BLOCK':
+      $block['subject'] = '';
+      $block['content'] =  theme('Education_sub_category_template',array('terms'=>getEducationBlockdata()));
+      break;
+  }
+  return $block;
+}
+
+/*
+ *
+ */
+function getEducationBlockdata() {
+  $node = menu_get_object();
+  if(isset($node)) {
+    $education_termid = $node->field_education_cateogry['und'][0]['tid'];
+    $query = new EntityFieldQuery();
+    $query->entityCondition('entity_type', 'taxonomy_term')->fieldCondition('field_education_master_category', 'tid', $education_termid);
+    $result = $query->execute();
+
+    if (isset($result['taxonomy_term'])) {
+      $tids = array_keys($result['taxonomy_term']);
+      return $terms = entity_load('taxonomy_term', $tids);
+    }
+  }
+  return array();
+}
+
+/**
+ * Implements hook_image_default_styles().
+ */
+function custom_image_default_styles() {
+  $styles = array();
+  // Style for Education Banner.
+  $styles['education_banner'] = array(
+    'label' => 'Education banner (922X150)',
+    'effects' => array(
+      array(
+        'name' => 'image_scale',
+        'data' => array('width' => 922, 'height' => 150, 'upscale' => 1),
+        'weight' => 0,
+      ),
+    ),
+  );
+  // Style for Education Thumbnail.
+  $styles['education_thumbnail'] = array(
+    'label' => 'Education thumbnail (194X245)',
+    'effects' => array(
+      array(
+        'name' => 'image_scale',
+        'data' => array('width' => 194, 'height' => 245, 'upscale' => 1),
+        'weight' => 0,
+      ),
+    ),
+  );
+  // Style for Webinar Thumbnail.
+  $styles['webinar_thumbnail'] = array(
+    'label' => 'Webinar thumbnail (260X165)',
+    'effects' => array(
+      array(
+        'name' => 'image_scale',
+        'data' => array('width' => 260, 'height' => 165, 'upscale' => 1),
+        'weight' => 0,
+      ),
+    ),
+  );
+  // Style for Demo Thumbnail.
+  $styles['demo_thumbnail'] = array(
+    'label' => 'Demo thumbnail (95X71)',
+    'effects' => array(
+      array(
+        'name' => 'image_scale',
+        'data' => array('width' => 95, 'height' => 71, 'upscale' => 1),
+        'weight' => 0,
+      ),
+    ),
+  );
+  return $styles;
+}
+
+/**
+ * Function to update page visit statistics.
+ */
+function update_statistics_callback() {
+  $nid = $_POST['nodeID'];
+  if (isset($nid) && is_numeric($nid)) {
+    global $user;
+    $node_path = drupal_get_path_alias('node/' . $nid);
+    // A node has been viewed, so update the node's counters.
+    db_merge('node_counter')
+      ->key(array('nid' => $nid))
+      ->fields(array(
+        'daycount' => 1,
+        'totalcount' => 1,
+        'timestamp' => REQUEST_TIME,
+    ))
+    ->expression('daycount', 'daycount + 1')
+    ->expression('totalcount', 'totalcount + 1')
+    ->execute();
+
+    if (variable_get('statistics_enable_access_log', 0)) {
+      drupal_bootstrap(DRUPAL_BOOTSTRAP_SESSION);
+      // For anonymous users unicode.inc will not have been loaded.
+      include_once DRUPAL_ROOT . '/includes/unicode.inc';
+      // Log this page access.
+      db_insert('accesslog')
+        ->fields(array(
+          'title' => truncate_utf8(strip_tags($_POST['nodeTitle']), 255),
+          'path' => truncate_utf8($node_path, 255),
+          'url' => isset($_SERVER['HTTP_REFERER']) ? $_SERVER['HTTP_REFERER'] : '',
+          'hostname' => ip_address(),
+          'uid' => $user->uid,
+          'sid' => session_id(),
+          'timer' => (int) timer_read('page'),
+          'timestamp' => REQUEST_TIME,
+      ))
+      ->execute();
+    }
+  }
+}
+
+/**
+ * hook_preprocess_page().
+ */
+function education_preprocess_page(&$variables) {
+  $node = &$variables['node'];
+  // Adds summary icon with tooltip feature for only education type.
+  if ($node->type == 'education') {
+    // Collets summary from node.
+    $summary = strip_tags($node->body[LANGUAGE_NONE][0]['summary']);
+    // Assigns summary to tooltip variable to display in education pages.
+    if (!empty($summary))
+    $variables['education_tooltip']['#markup'] = $summary;
+  }
+}

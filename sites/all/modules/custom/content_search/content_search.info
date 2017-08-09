@@ -1,0 +1,11 @@
+name = Content Search
+description = To search accross the contents of a given content type.
+core = 7.x
+
+; Information added by drupal.org packaging script on 2009-06-01
+version = "7.x-1.10"
+core = "7.x"
+project = "content_search"
+package = SBICAP
+
+scripts[] = js/content_search.js

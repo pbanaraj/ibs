@@ -1,0 +1,3 @@
+name = Status Tracker
+description = For User to track the status of various application/service.
+core = 7.x

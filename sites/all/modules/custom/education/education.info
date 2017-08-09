@@ -1,0 +1,20 @@
+name = Education
+description = Provide complete information about Education.
+core = 7.x
+
+; Information added by drupal.org packaging script on 2009-06-01
+version = "7.x-1.10"
+core = "7.x"
+project = "education"
+package = SBICAP
+
+dependencies[] = content_search
+dependencies[] = sbicap_demos
+dependencies[] = feature_education
+dependencies[] = feature_education_demos
+dependencies[] = feature_learning_room
+dependencies[] = feature_smart_insights
+dependencies[] = feature_tools
+dependencies[] = feature_webinar
+
+scripts[] = js/education.js

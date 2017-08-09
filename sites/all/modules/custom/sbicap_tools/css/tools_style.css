@@ -1,0 +1,1774 @@
+.Heading
+{
+	font-family:Calibri;
+	color:#434545;
+	font-size:12px;
+	font-weight:bold;	
+}
+.TPad2
+{
+	padding:2px 0px 0px 0px;
+}
+.RPad10
+{
+	padding:0px 13px 0px 0px;
+}
+.TBPad5
+{
+	padding:5px 0px 5px 0px;
+}
+.TRBPad5
+{
+	padding:5px 5px 5px 0px;
+}
+.TLBPad5
+{
+	padding:5px 0px 5px 0px;
+}
+.TBPad10
+{
+	padding:10px 0px 10px 0px;
+}
+.TBLPad10
+{
+	padding:10px 0px 10px 10px;
+}
+.TRBLPad10
+{
+	padding:10px 10px 10px 10px;
+}
+.Bgcl
+{
+	background-color:#DDF2F5;
+}
+.BorderAll
+{
+	border:1px solid #807B7B;	
+}
+.BorderLeft
+{
+	border-left:1px solid #807B7B;	
+}
+.BorderRight
+{
+	border-right:1px solid #807B7B;	
+}
+.BorderBottom
+{
+	border-bottom:1px solid #807B7B;	
+}
+.NoData
+{
+	color:#FF0000;	
+}
+.Graytext
+{
+	font-family:Calibri;
+	color:#434545;
+	font-size:12px;
+	font-weight:normal;	
+}
+
+.txtBlue{font-weight:bold; padding-left:10px; font-family:Calibri!important;font-size:12px!important;vertical-align:middle!important;color:#434545!important}
+td,th
+{
+    FONT-SIZE: 9pt;
+    COLOR: black;
+	font-family: Calibri;
+    margin-left:0pt;
+	padding-top:4px;
+	padding-bottom:4px;
+	padding-left:2px;
+	/*background-color:#FFFFFF*/
+}
+
+.BlacktxtBold
+{
+	font-family:Calibri;
+	font-size:13px;
+	color:#000000;
+    font-weight:bold;
+    
+}
+.DropDown{
+	background-color: #D6212A;
+	border:1px solid #000000;
+	color:#ffffff;
+	font-family: calibri;
+	font-size: 12px;
+	padding-left:2px;
+	text-align:left;
+} 
+.textbox
+{
+	font-family:Calibri;
+	color:#fff;
+	font-size: 12px;
+	background-color:Transparent;
+	border:1px solid #60a8c0;
+	padding:2px 0px 2px 10px;	
+	
+}
+.TabSelect
+{
+	background-color:#DDF2F5;
+	font-family:Calibri;
+	font-size:14px;
+	font-weight:bold;
+	color:#FF0000;
+	height:15px;
+	text-align:center;
+}
+.TabUnSelect
+{
+	background-color:#DDF2F5;
+	font-family:Calibri;
+	font-size:14px;
+	font-weight:bold;
+	color:#434545;
+	height:15px;
+	text-align:center;
+}
+.Pointer
+{
+	cursor:pointer;
+}
+/*Style for Rupee Symbol*/
+@font-face 
+{
+	font-family:RupeeFont;
+	src: url("images/Rupee.eot");		
+}
+@font-face 
+{
+	font-family:RupeeFont;
+	src: url("images/Rupee.ttf");		
+}
+.rupee {/*font-family:RupeeFont;*/ font-family:calibri; font-weight:bold;  font-size:12px;}
+.rupee span {position:absolute;text-indent: -9999em;left:-9999em;}
+.rupeeNews span {display:none;}
+.rupeeNews {font-family:RupeeFont;font-size:12px;}
+/*End Style for Rupee Symbol*/	
+.tagLine{
+	font-size:12px;
+	color:#000;
+	margin-bottom:20px;
+	}
+
+.tagLine i{
+	color:#000;
+	margin:0px 3px;}
+	
+.tagLine span, .tagLine span i{
+	font-size:12px;
+	color:#d50c0e;}
+	
+	.sp_message
+	{
+	   font-family: calibri;
+       color: #076A8B;
+       font-weight: bold;
+       font-size: 16px;
+       text-align: justify;
+       line-height:23px;
+       width:100%;
+       border-radius:10px;
+     
+       background:#7CCCE1;
+       padding:10px 20px;
+     }
+	.below_box1
+	{
+	background: #7ccce1;
+    padding: 18px 35px;
+    font-family: calibri;
+    font-size: 14px;
+    color: #076A8B;
+    line-height: 22px;
+    text-align: justify;
+    font-weight: bold;
+    border-radius:10px;
+    }
+	 .description_heading 
+        {
+            font-family: calibri;
+            color: #468DBA;
+            font-weight: 400;
+            font-size: 18px;
+        }
+        .paddLeft5{padding-left:5px;}
+        .description_text
+        {
+            font-family: calibri;
+            color: #346C90;
+            font-weight: bold;
+            font-size: 12px;
+            line-height: 20px;
+            text-align: justify;
+        }
+        .description_heading12
+        {
+            font-family: calibri;
+            color: #468DBA;
+            font-weight: 400;
+            font-size: 12px;
+        }
+        .normal_txt
+        {
+            color: #666d6e;
+            font-size: 12px;
+            line-height: 18px;
+        }
+        .rsk_pfl
+        {
+            color: #414343;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        .Result
+        {
+            color: #414343;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        .bar_headr
+        {
+            color: #346C90;
+            font-size: 12px;
+            font-weight: 600;
+            line-height: 24px;
+        }
+        .Button
+        {
+            background: url(../images/btn_bg.jpg) repeat-x;
+            color: #34679a;
+            border: 1px solid #b5daf5;
+            font-weight: 600;
+            font-size: 12px;
+            width: 72px;
+            height: 24px;
+            text-align: center;
+            cursor:pointer;
+            text-decoration: none;
+            font-family:Calibri;
+            
+        }
+        a.Button, a.Button:link, a.Button:visited, a.Button:active, a.Button:focus
+        {
+            background: url(../images/btn_bg.jpg) repeat-x;
+            color: #34679a;
+            border: 1px solid #b5daf5;
+            font-weight: 600;
+            font-size: 12px;
+            width: 72px;
+            height: 30px;
+            text-align: center;
+            text-decoration: none;
+           
+        }
+        .textbox
+        {
+            padding: 0 10px;
+            height: 35px;
+            width: 80px;
+            line-height: 35px;
+            color: #fff;
+            font-size: 12px;
+            font-family: calibri;
+            border: none;
+            background-image:url(../images/Textbox_bg.png);
+            background-repeat:no-repeat;
+        }
+        
+        .textbox_Revenue
+        {
+            padding: 0 10px;
+            height: 35px;
+            width: 102px;
+            line-height: 35px;
+            color: #fff;
+            font-size: 12px;
+            font-family: calibri;
+            border: none;
+            background-image: url(../images/Textbox_bg.png);
+            background-repeat: no-repeat;
+            background-color: transparent !important;
+        }
+        .below_box
+        {
+            background: #7ccce1;
+            border-radius: 10px;
+            font-family: calibri;
+            font-size: 12px;
+            color: #FFFFFF;
+            line-height: 22px;
+            text-align: justify;
+        }   
+        .help_link_div
+        {
+            display:none;
+            cursor:pointer;
+        }
+        .help_link
+        {
+            text-decoration:none;
+            cursor:pointer;
+        } 
+         .help_link_1
+        {
+            text-decoration:none;
+            cursor:pointer;
+        } 
+        .help_link_div
+        {
+            display:none;
+            cursor:pointer;
+            
+        }
+         .help_link_2
+        {
+            text-decoration: none;
+            cursor: pointer;
+        }
+        .help_link_3
+        {
+            text-decoration: none;
+            cursor: pointer;
+        }
+        .help_link_4
+        {
+            text-decoration: none;
+            cursor: pointer;
+        }
+        .help_link_5
+        {
+            text-decoration: none;
+            cursor: pointer;
+        }
+        .help_link_div
+        {
+            display: none;
+            cursor: pointer;
+        }
+        .help_link_div_1
+        {
+            display: none;
+            cursor: pointer;
+        }
+        .help_link_div_2
+        {
+            display: none;
+            cursor: pointer;
+        }
+        .help_link_div_3
+        {
+            display: none;
+            cursor: pointer;
+        }
+        .help_link_div_4
+        {
+            display: none;
+            cursor: pointer;
+        }
+        .help_link_div_5
+        {
+            display: none;
+            cursor: pointer;
+        }
+        
+        .help_link_div_6
+        {
+            display:none;
+            cursor:pointer;
+        }
+        .help_link_div_7
+        {
+            display:none;
+            cursor:pointer;
+        }
+        .help_link_div_8
+        {
+            display:none;
+            cursor:pointer;
+        }
+        
+        .help_link_div_9
+        {
+            display:none;
+            cursor:pointer;
+        }
+        .help_link_div_10
+        {
+            display:none;
+            cursor:pointer;
+        }
+        
+        .help_link_div_11
+        {
+            display:none;
+            cursor:pointer;
+        }
+        
+        .help_link_div_12
+        {
+            display:none;
+            cursor:pointer;
+        }
+        
+        .help_link_div_13
+        {
+            display:none;
+            cursor:pointer;
+        }
+        .help_link_div_14
+        {
+            display:none;
+            cursor:pointer;
+        }
+        .help_link_div_15
+        {
+            display:none;
+            cursor:pointer;
+        }
+        .help_link_div_16
+        {
+            display:none;
+            cursor:pointer;
+        }
+       .help_link_div_17
+        {
+            display:none;
+            cursor:pointer;
+        }
+       .help_link_div_18
+        {
+            display:none;
+            cursor:pointer;
+        }
+        
+        .help_link_div_19
+        {
+            display:none;
+            cursor:pointer;
+        }
+        
+        .help_link_div_20
+        {
+            display:none;
+            cursor:pointer;
+        }
+        
+        .help_link_div_21
+        {
+            display:none;
+            cursor:pointer;
+        }
+        
+        .help_link_div_22
+        {
+            display:none;
+            cursor:pointer;
+        }
+        .help_link_div_23
+        {
+            display:none;
+            cursor:pointer;
+        }
+        
+        .help_link_div_24
+        {
+            display:none;
+            cursor:pointer;
+        }
+        
+        .help_link_div_25
+        {
+            display:none;
+            cursor:pointer;
+        }
+        
+          .help_link_6
+        {
+            text-decoration:none;
+            cursor:pointer;
+        } 
+          .help_link_7
+        {
+            text-decoration:none;
+            cursor:pointer;
+        } 
+          .help_link_8
+        {
+            text-decoration:none;
+            cursor:pointer;
+        } 
+          .help_link_9
+        {
+            text-decoration:none;
+            cursor:pointer;
+        } 
+          .help_link_10
+        {
+            text-decoration:none;
+            cursor:pointer;
+        } 
+          .help_link_11
+        {
+            text-decoration:none;
+            cursor:pointer;
+        } 
+          .help_link_12
+        {
+            text-decoration:none;
+            cursor:pointer;
+        } 
+          .help_link_13
+        {
+            text-decoration:none;
+            cursor:pointer;
+        }
+        
+          .help_link_14
+        {
+            text-decoration:none;
+            cursor:pointer;
+        } 
+          .help_link_15
+        {
+            text-decoration:none;
+            cursor:pointer;
+        } 
+          .help_link_16
+        {
+            text-decoration:none;
+            cursor:pointer;
+        } 
+          .help_link_17
+        {
+            text-decoration:none;
+            cursor:pointer;
+        } 
+          .help_link_18
+        {
+            text-decoration:none;
+            cursor:pointer;
+        } 
+          .help_link_19
+        {
+            text-decoration:none;
+            cursor:pointer;
+        } 
+          .help_link_20
+        {
+            text-decoration:none;
+            cursor:pointer;
+        } 
+          .help_link_21
+        {
+            text-decoration:none;
+            cursor:pointer;
+        } 
+          .help_link_22
+        {
+            text-decoration:none;
+            cursor:pointer;
+        } 
+          .help_link_23
+        {
+            text-decoration:none;
+            cursor:pointer;
+        } 
+          .help_link_24
+        {
+            text-decoration:none;
+            cursor:pointer;
+        } 
+          .help_link_25
+        {
+            text-decoration:none;
+            cursor:pointer;
+        } 
+        
+         .help_link_div_1
+        {
+            display:none;
+            cursor:pointer;
+        }
+       
+        .bg_div_1
+        {
+               background : url(../images/calc_help_bg.jpg);
+                width: 205px;
+                height: 30px;
+                position: absolute;
+                margin-top: -30px;
+                margin-left: 158px;
+                color: White;
+                font-size: 12px;
+                padding-left: 16px;
+               padding-top: 1px;
+               line-height:14px;
+               padding-right:10px;
+        }   
+        
+         .bg_div_sip_1
+        {
+                background: url(../images/calc_help_bg.jpg);
+                  width: 205px;
+                  height: 30px;
+                  position: absolute;
+                  margin-top: -32px;
+                  margin-left: 77px;
+                  color: White;
+                  font-size: 12px;
+                  padding-left: 16px;
+                  padding-top: 1px;
+                  line-height: 10px;
+                  padding-right: 6px;
+        }   
+         .bg_div_2
+        {
+               background : url(../images/calc_help_bg.jpg);
+                width: 205px;
+                height: 30px;
+                position: absolute;
+                margin-top: -30px;
+                margin-left: 143px;
+                color: White;
+                font-size: 12px;
+                padding-left: 14px;
+               padding-top: 1px;
+               line-height:14px;
+        }  
+        
+        .bg_div_sip_2
+        {
+             background : url(../images/calc_help_bg.jpg);
+                width: 205px;
+                height: 30px;
+                position: absolute;
+                margin-top: -30px;
+                margin-left: 110px;
+                color: White;
+                font-size: 12px;
+                padding-left: 14px;
+               padding-top: 1px;
+               line-height:14px;
+            
+        }
+        
+        .bg_div_3
+        {
+               background : url(../images/calc_help_bg.jpg);
+                width: 205px;
+                height: 30px;
+                position: absolute;
+                margin-top: -30px;
+                margin-left: 91px;
+                color: White;
+                font-size: 12px;
+                padding-left: 16px;
+               padding-top: 1px;
+               line-height:14px;
+               padding-right:8px;
+        }  
+        
+        .bg_div_sip_3
+        {
+            background : url(../images/calc_help_bg.jpg);
+                width: 205px;
+                height: 30px;
+                position: absolute;
+                margin-top: -30px;
+                margin-left: 81px;
+                color: White;
+                font-size: 12px;
+                padding-left: 16px;
+               padding-top: 1px;
+               line-height:14px;
+               padding-right:8px;
+            
+        }
+        .bg_div
+        {
+               background : url(../images/calc_help_bg.jpg);
+                width: 205px;
+                height: 30px;
+                position: absolute;
+                margin-top: -30px;
+                margin-left: 85px;
+                color: White;
+                font-size: 12px;
+                padding-left: 22px;
+               padding-top: 1px;
+               line-height:10px;
+        }  
+        
+        .bg_div_sip
+        {
+               background : url(../images/calc_help_bg.jpg);
+                width: 205px;
+                height: 30px;
+                position: absolute;
+                margin-top: -30px;
+                margin-left: 67px;
+                color: White;
+                font-size: 12px;
+                padding-left: 22px;
+               padding-top: 1px;
+               line-height:10px;
+        }  
+        
+       .bg_div_Networth_1
+        {
+               background : url(../images/calc_help_bg.jpg);
+                width: 205px;
+                height: 30px;
+                position: absolute;
+                margin-top: -30px;
+                margin-left: 55px;
+                color: White;
+                font-size: 12px;
+                padding-left: 15px;
+               padding-top: 1px;
+               line-height:14px;
+        }   
+         .bg_div_Networth_2
+        {
+               background : url(../images/calc_help_bg.jpg);
+                width: 205px;
+                height: 30px;
+                position: absolute;
+                margin-top: -30px;
+                margin-left: 92px;
+                color: White;
+                font-size: 12px;
+                padding-left: 14px;
+               padding-top: 1px;
+               line-height:14px;
+        }  
+        
+        .bg_div_Networth_3
+        {
+               background : url(../images/calc_help_bg.jpg);
+                width: 205px;
+                height: 30px;
+                position: absolute;
+                margin-top: -30px;
+                margin-left: 68px;
+                color: White;
+                font-size: 12px;
+                padding-left: 14px;
+               padding-top: 1px;
+               line-height:14px;
+        } 
+        
+                .bg_div_Networth_4
+        {
+               background : url(../images/calc_help_bg.jpg);
+                width: 205px;
+                height: 30px;
+                position: absolute;
+                margin-top: -30px;
+                margin-left: 70px;
+                color: White;
+                font-size: 12px;
+                padding-left: 14px;
+               padding-top: 1px;
+               line-height:14px;
+        } 
+        
+                .bg_div_Networth_5
+        {
+               background : url(../images/calc_help_bg.jpg);
+                width: 205px;
+                height: 30px;
+                position: absolute;
+                margin-top: -30px;
+                margin-left: 128px;
+                color: White;
+                font-size: 12px;
+                padding-left: 14px;
+               padding-top: 1px;
+               line-height:14px;
+        } 
+        
+              .bg_div_Networth_6
+        {
+               background : url(../images/calc_help_bg.jpg);
+                width: 205px;
+                height: 30px;
+                position: absolute;
+                margin-top: -30px;
+                margin-left: 83px;
+                color: White;
+                font-size: 12px;
+                padding-left: 16px;
+               padding-top: 1px;
+               line-height:14px;
+               padding-right:9px;
+        } 
+        
+                .bg_div_Networth_7
+        {
+               background : url(../images/calc_help_bg.jpg);
+                width: 205px;
+                height: 30px;
+                position: absolute;
+                margin-top: -30px;
+                margin-left: 105px;
+                color: White;
+                font-size: 12px;
+                padding-left: 14px;
+               padding-top: 1px;
+               line-height:14px;
+               padding-right:11px;
+        } 
+        
+                .bg_div_Networth_8
+        {
+               background : url(../images/calc_help_bg.jpg);
+                width: 205px;
+                height: 30px;
+                position: absolute;
+                margin-top: -30px;
+                margin-left: 102px;
+                color: White;
+                font-size: 12px;
+                padding-left: 14px;
+               padding-top: 1px;
+               line-height:14px;
+        } 
+        
+                .bg_div_Networth_9
+        {
+               background : url(../images/calc_help_bg.jpg);
+                width: 207px;
+                height: 30px;
+                position: absolute;
+                margin-top: -30px;
+                margin-left: 251px;
+                color: White;
+                font-size: 12px;
+                padding-left: 14px;
+               padding-top: 1px;
+               line-height:10px;
+               font-family:Calibri;
+        } 
+        
+                .bg_div_Networth_10
+        {
+               background : url(../images/calc_help_bg.jpg);
+                width: 207px;
+                height: 30px;
+                position: absolute;
+                margin-top: -30px;
+                margin-left: 107px;
+                color: White;
+                font-size: 12px;
+                padding-left: 14px;
+               padding-top: 1px;
+               line-height:10px;
+        } 
+        
+                .bg_div_Networth_11
+        {
+               background : url(../images/calc_help_bg.jpg);
+                width: 205px;
+                height: 30px;
+                position: absolute;
+                margin-top: -30px;
+                margin-left: 159px;
+                color: White;
+                font-size: 12px;
+                padding-left: 14px;
+               padding-top: 1px;
+               line-height:14px;
+        } 
+        
+                .bg_div_Networth_12
+        {
+               background : url(../images/calc_help_bg.jpg);
+                width: 205px;
+                height: 30px;
+                position: absolute;
+                margin-top: -30px;
+                margin-left: 165px;
+                color: White;
+                font-size: 12px;
+                padding-left: 14px;
+               padding-top: 1px;
+               line-height:14px;
+        } 
+        
+                .bg_div_Networth_13
+        {
+               background : url(../images/calc_help_bg.jpg);
+                width: 90px;
+                height: 24px;
+                position: absolute;
+                margin-top: -30px;
+                margin-left: 95px;
+                color: White;
+                font-size: 12px;
+                padding-left: 14px;
+               padding-top: 1px;
+               line-height:14px;
+        } 
+        
+                .bg_div_Networth_14
+        {
+               background : url(../images/calc_help_bg.jpg);
+                width: 144px;
+                height: 25px;
+                position: absolute;
+                margin-top: -30px;
+                margin-left: 127px;
+                color: White;
+                font-size: 12px;
+                padding-left: 14px;
+               padding-top: 1px;
+               line-height:14px;
+        } 
+        
+                .bg_div_Networth_15
+        {
+               background : url(../images/calc_help_bg.jpg);
+                width: 127px;
+                height: 25px;
+                position: absolute;
+                margin-top: -30px;
+                margin-left: 92px;
+                color: White;
+                font-size: 12px;
+                padding-left: 14px;
+               padding-top: 1px;
+               line-height:14px;
+        }
+        
+                .bg_div_Networth_16
+        {
+               background : url(../images/calc_help_bg.jpg);
+                width: 205px;
+                height: 30px;
+                position: absolute;
+                margin-top: -30px;
+                margin-left: 217px;
+                color: White;
+                font-size: 12px;
+                padding-left: 14px;
+               padding-top: 1px;
+               line-height:10px;
+               padding-right:7px;
+        }  
+        
+                .bg_div_Networth_17
+        {
+               background : url(../images/calc_help_bg.jpg);
+                width: 205px;
+                height: 30px;
+                position: absolute;
+                margin-top: -30px;
+                margin-left: 198px;
+                color: White;
+                font-size: 12px;
+                padding-left: 14px;
+               padding-top: 1px;
+               line-height:10px;
+                padding-right:7px;
+        } 
+        
+                .bg_div_Networth_18
+        {
+               background : url(../images/calc_help_bg.jpg);
+                width: 205px;
+                height: 30px;
+                position: absolute;
+                margin-top: -30px;
+                margin-left:217px;
+                color: White;
+                font-size: 12px;
+                padding-left: 14px;
+               padding-top: 1px;
+               line-height:10px;
+                padding-right:7px;
+        } 
+        
+                .bg_div_Networth_19
+        {
+               background : url(../images/calc_help_bg.jpg);
+                width: 205px;
+                height: 30px;
+                position: absolute;
+                margin-top: -30px;
+                margin-left: 230px;
+                color: White;
+                font-size: 12px;
+                padding-left: 14px;
+               padding-top: 1px;
+               line-height:10px;
+                padding-right:7px;
+        } 
+        
+                .bg_div_Networth_20
+        {
+               background : url(../images/calc_help_bg.jpg);
+                width: 205px;
+                height: 30px;
+                position: absolute;
+                margin-top: -30px;
+                margin-left: 240px;
+                color: White;
+                font-size: 12px;
+                padding-left: 14px;
+               padding-top: 1px;
+               line-height:10px;
+                padding-right:7px;
+        } 
+        
+                .bg_div_Networth_21
+        {
+               background : url(../images/calc_help_bg.jpg);
+                width: 207px;
+                height: 30px;
+                position: absolute;
+                margin-top: -30px;
+                margin-left: 91px;
+                color: White;
+                font-size: 12px;
+                padding-left: 14px;
+               padding-top: 1px;
+               line-height:9px;
+                padding-right:7px;
+        } 
+        
+                .bg_div_Networth_22
+        {
+               background : url(../images/calc_help_bg.jpg);
+                width: 205px;
+                height: 30px;
+                position: absolute;
+                margin-top: -30px;
+                margin-left: 150px;
+                color: White;
+                font-size: 12px;
+                padding-left: 16px;
+               padding-top: 1px;
+               line-height:10px;
+                padding-right:8px;
+        } 
+        
+                .bg_div_Networth_23
+        {
+               background : url(../images/calc_help_bg.jpg);
+                width: 205px;
+                height: 30px;
+                position: absolute;
+                margin-top: -30px;
+                margin-left: 110px;
+                color: White;
+                font-size: 12px;
+                padding-left: 14px;
+               padding-top: 1px;
+               line-height:14px;
+                padding-right:7px;
+        } 
+        
+                .bg_div_Networth_24
+        {
+               background : url(../images/calc_help_bg.jpg);
+                width: 125px;
+                height: 25px;
+                position: absolute;
+                margin-top: -30px;
+                margin-left: 105px;
+                color: White;
+                font-size: 12px;
+                padding-left: 14px;
+               padding-top: 1px;
+               line-height:14px;
+                padding-right:7px;
+        }
+        
+           .bg_div_Networth_25
+        {
+               background : url(../images/calc_help_bg.jpg);
+                width: 205px;
+                height: 30px;
+                position: absolute;
+                margin-top: -30px;
+                margin-left: 206px;
+                color: White;
+                font-size: 12px;
+                padding-left: 14px;
+               padding-top: 1px;
+               line-height:14px;
+                padding-right:7px;
+        }
+        
+        
+        
+        .bg_div_4
+        {
+            background: url(../images/calc_help_bg.jpg);
+            width: 205px;
+            height: 30px;
+            position: absolute;
+            margin-top: -30px;
+            margin-left: 102px;
+            color: White;
+            font-size: 12px;
+            padding-left: 22px;
+            padding-top: 1px;
+            line-height: 14px;
+            padding-right: 10px;
+        }
+        
+        .bg_div_sip_4
+        {
+            background: url(../images/calc_help_bg.jpg);
+            width: 205px;
+            height: 30px;
+            position: absolute;
+            margin-top: -30px;
+            margin-left: 102px;
+            color: White;
+            font-size: 12px;
+            padding-left: 22px;
+            padding-top: 1px;
+            line-height: 10px;
+            padding-right: 10px;
+        }
+        
+        .bg_div_5
+        {
+            background: url(../images/calc_help_bg.jpg);
+            width: 205px;
+            height: 30px;
+            position: absolute;
+            margin-top: -30px;
+            margin-left: 82px;
+            color: White;
+            font-size: 12px;
+            padding-left: 22px;
+            padding-top: 1px;
+            line-height: 14px;
+        }
+        
+         .bg_div_sip_5
+        {
+            background: url(../images/calc_help_bg.jpg);
+            width: 205px;
+            height: 30px;
+            position: absolute;
+            margin-top: -30px;
+            margin-left: 82px;
+            color: White;
+            font-size: 12px;
+            padding-left: 22px;
+            padding-top: 1px;
+            line-height: 14px;
+        }
+        
+           .bg_div_6
+          {
+               background : url(images/calc_help_bg.jpg);
+                width: 205px;
+                height: 30px;
+                position: absolute;
+                margin-top: -30px;
+                margin-left: 83px;
+                color: White;
+                font-size: 12px;
+                padding-left: 16px;
+               padding-top: 1px;
+               line-height:14px;
+               padding-right:9px;
+        } 
+        
+                .bg_div_7
+        {
+               background : url(images/calc_help_bg.jpg);
+                width: 205px;
+                height: 30px;
+                position: absolute;
+                margin-top: -30px;
+                margin-left: 105px;
+                color: White;
+                font-size: 12px;
+                padding-left: 14px;
+               padding-top: 1px;
+               line-height:14px;
+               padding-right:11px;
+        } 
+        
+                .bg_div_8
+        {
+               background : url(images/calc_help_bg.jpg);
+                width: 205px;
+                height: 30px;
+                position: absolute;
+                margin-top: -30px;
+                margin-left: 102px;
+                color: White;
+                font-size: 12px;
+                padding-left: 14px;
+               padding-top: 1px;
+               line-height:14px;
+        } 
+        
+                .bg_div_9
+        {
+               background : url(images/calc_help_bg.jpg);
+                width: 207px;
+                height: 30px;
+                position: absolute;
+                margin-top: -30px;
+                margin-left: 251px;
+                color: White;
+                font-size: 12px;
+                padding-left: 14px;
+               padding-top: 1px;
+               line-height:10px;
+        } 
+        
+                .bg_div_10
+        {
+               background : url(images/calc_help_bg.jpg);
+                width: 207px;
+                height: 30px;
+                position: absolute;
+                margin-top: -30px;
+                margin-left: 107px;
+                color: White;
+                font-size: 12px;
+                padding-left: 14px;
+               padding-top: 1px;
+               line-height:10px;
+        } 
+        
+                .bg_div_11
+        {
+               background : url(images/calc_help_bg.jpg);
+                width: 205px;
+                height: 30px;
+                position: absolute;
+                margin-top: -30px;
+                margin-left: 159px;
+                color: White;
+                font-size: 12px;
+                padding-left: 14px;
+               padding-top: 1px;
+               line-height:14px;
+        } 
+        
+                .bg_div_12
+        {
+               background : url(images/calc_help_bg.jpg);
+                width: 205px;
+                height: 30px;
+                position: absolute;
+                margin-top: -30px;
+                margin-left: 165px;
+                color: White;
+                font-size: 12px;
+                padding-left: 14px;
+               padding-top: 1px;
+               line-height:14px;
+        } 
+        
+                .bg_div_13
+        {
+               background : url(images/calc_help_bg.jpg);
+                width: 90px;
+                height: 24px;
+                position: absolute;
+                margin-top: -30px;
+                margin-left: 95px;
+                color: White;
+                font-size: 12px;
+                padding-left: 14px;
+               padding-top: 1px;
+               line-height:14px;
+        } 
+        
+                .bg_div_14
+        {
+               background : url(images/calc_help_bg.jpg);
+                width: 144px;
+                height: 25px;
+                position: absolute;
+                margin-top: -30px;
+                margin-left: 127px;
+                color: White;
+                font-size: 12px;
+                padding-left: 14px;
+               padding-top: 1px;
+               line-height:14px;
+        } 
+        
+                .bg_div_15
+        {
+               background : url(images/calc_help_bg.jpg);
+                width: 127px;
+                height: 25px;
+                position: absolute;
+                margin-top: -30px;
+                margin-left: 92px;
+                color: White;
+                font-size: 12px;
+                padding-left: 14px;
+               padding-top: 1px;
+               line-height:14px;
+        }
+        
+                .bg_div_16
+        {
+               background : url(images/calc_help_bg.jpg);
+                width: 205px;
+                height: 30px;
+                position: absolute;
+                margin-top: -30px;
+                margin-left: 217px;
+                color: White;
+                font-size: 12px;
+                padding-left: 14px;
+               padding-top: 1px;
+               line-height:10px;
+               padding-right:7px;
+        }  
+        
+                .bg_div_17
+        {
+               background : url(images/calc_help_bg.jpg);
+                width: 205px;
+                height: 30px;
+                position: absolute;
+                margin-top: -30px;
+                margin-left: 198px;
+                color: White;
+                font-size: 12px;
+                padding-left: 14px;
+               padding-top: 1px;
+               line-height:10px;
+                padding-right:7px;
+        } 
+        
+                .bg_div_18
+        {
+               background : url(images/calc_help_bg.jpg);
+                width: 205px;
+                height: 30px;
+                position: absolute;
+                margin-top: -30px;
+                margin-left:217px;
+                color: White;
+                font-size: 12px;
+                padding-left: 14px;
+               padding-top: 1px;
+               line-height:10px;
+                padding-right:7px;
+        } 
+        
+                .bg_div_19
+        {
+               background : url(images/calc_help_bg.jpg);
+                width: 205px;
+                height: 30px;
+                position: absolute;
+                margin-top: -30px;
+                margin-left: 230px;
+                color: White;
+                font-size: 12px;
+                padding-left: 14px;
+               padding-top: 1px;
+               line-height:10px;
+                padding-right:7px;
+        } 
+        
+                .bg_div_20
+        {
+               background : url(images/calc_help_bg.jpg);
+                width: 205px;
+                height: 30px;
+                position: absolute;
+                margin-top: -30px;
+                margin-left: 240px;
+                color: White;
+                font-size: 12px;
+                padding-left: 14px;
+               padding-top: 1px;
+               line-height:10px;
+                padding-right:7px;
+        } 
+        
+                .bg_div_21
+        {
+               background : url(images/calc_help_bg.jpg);
+                width: 207px;
+                height: 30px;
+                position: absolute;
+                margin-top: -30px;
+                margin-left: 91px;
+                color: White;
+                font-size: 12px;
+                padding-left: 14px;
+               padding-top: 1px;
+               line-height:9px;
+                padding-right:7px;
+        } 
+        
+                .bg_div_22
+        {
+               background : url(images/calc_help_bg.jpg);
+                width: 205px;
+                height: 30px;
+                position: absolute;
+                margin-top: -30px;
+                margin-left: 150px;
+                color: White;
+                font-size: 12px;
+                padding-left: 16px;
+               padding-top: 1px;
+               line-height:10px;
+                padding-right:8px;
+        } 
+        
+                .bg_div_23
+        {
+               background : url(images/calc_help_bg.jpg);
+                width: 205px;
+                height: 30px;
+                position: absolute;
+                margin-top: -30px;
+                margin-left: 110px;
+                color: White;
+                font-size: 12px;
+                padding-left: 14px;
+               padding-top: 1px;
+               line-height:14px;
+                padding-right:7px;
+        } 
+        
+                .bg_div_24
+        {
+               background : url(images/calc_help_bg.jpg);
+                width: 125px;
+                height: 25px;
+                position: absolute;
+                margin-top: -30px;
+                margin-left: 105px;
+                color: White;
+                font-size: 12px;
+                padding-left: 14px;
+               padding-top: 1px;
+               line-height:14px;
+                padding-right:7px;
+        }
+        
+                   .bg_div_25
+        {
+               background : url(images/calc_help_bg.jpg);
+                width: 205px;
+                height: 30px;
+                position: absolute;
+                margin-top: -30px;
+                margin-left: 206px;
+                color: White;
+                font-size: 12px;
+                padding-left: 14px;
+               padding-top: 1px;
+               line-height:14px;
+                padding-right:7px;
+        }
+        
+        .bg_div_infaltion11
+        {
+            background: url(../images/calc_help_bg.jpg);
+            width: 197px;
+            height: 30px;
+            position: absolute;
+            margin-top: -30px;
+            margin-left: 110px;
+            color: White;
+            font-size: 12px;
+            padding-left: 15px;
+            padding-top: 1px;
+            line-height: 14px;
+            
+        }
+        .bg_div_infaltion12
+        {
+            background: url(../images/calc_help_bg.jpg);
+            width: 190px;
+            height: 30px;
+            position: absolute;
+            margin-top: -30px;
+            margin-left: 122px;
+            color: White;
+            font-size: 12px;
+            padding-left: 14px;
+            padding-top: 1px;
+            line-height: 10px;
+            padding-right: 8px;
+            
+            
+        }
+        
+        .bg_div_infaltion13
+        {
+            background: url(../images/calc_help_bg.jpg);
+            width: 208px;
+            height: 30px;
+            position: absolute;
+            margin-top: -30px;
+            margin-left: 137px;
+            color: White;
+            font-size: 12px;
+            padding-left: 14px;
+            padding-top: 1px;
+            line-height: 10px;
+            padding-right: 6px;
+        }
+        
+         .bg_div_infaltion14
+        {
+            background: url(../images/calc_help_bg.jpg);
+            width: 205px;
+            height: 30px;
+            position: absolute;
+            margin-top: -30px;
+            margin-left: 137px;
+            color: White;
+            font-size: 12px;
+            padding-left: 14px;
+            padding-top: 1px;
+            line-height: 14px;
+            padding-right: 6px;
+        }
+        
+         .bg_div_infaltion15
+        {
+            background: url(../images/calc_help_bg.jpg);
+            width: 205px;
+            height: 30px;
+            position: absolute;
+            margin-top: -30px;
+            margin-left: 102px;
+            color: White;
+            font-size: 12px;
+            padding-left: 22px;
+            padding-top: 1px;
+            line-height: 14px;
+            padding-right: 10px;
+        }
+        .bg_div_infaltion16
+        {
+            background: url(../images/calc_help_bg.jpg);
+            width: 205px;
+            height: 30px;
+            position: absolute;
+            margin-top: -30px;
+            margin-left: 82px;
+            color: White;
+            font-size: 12px;
+            padding-left: 22px;
+            padding-top: 1px;
+            line-height: 14px;
+        }
+        
+          .bg_div_Investment
+             {
+               background : url(../images/calc_help_bg.jpg);
+                width: 91px;
+                height: 20px;
+                position: absolute;
+                margin-top: -30px;
+                margin-left: 92px;
+                color: White;
+                font-size: 12px;
+                padding-left: 22px;
+               padding-top: 1px;
+               line-height:14px;
+               
+        }  
+        
+         .bg_div_Investment_1
+        {
+               background : url(../images/calc_help_bg.jpg);
+                width: 205px;
+                height: 30px;
+                position: absolute;
+                margin-top: -30px;
+                margin-left: 123px;
+                color: White;
+                font-size: 12px;
+                padding-left: 22px;
+               padding-top: 1px;
+               line-height:14px;
+               padding-right:8px;
+        }   
+         .bg_div_Investment_2
+        {
+               background : url(../images/calc_help_bg.jpg);
+                width: 205px;
+                height: 30px;
+                position: absolute;
+                margin-top: -30px;
+                margin-left: 140px;
+                color: White;
+                font-size: 12px;
+                padding-left: 14px;
+               padding-top: 1px;
+               line-height:10px;
+               padding-right:8px;
+        }  
+        
+         .bg_div_Investment_3
+        {
+               background : url(../images/calc_help_bg.jpg);
+                width: 205px;
+                height: 30px;
+                position: absolute;
+                margin-top: -30px;
+                margin-left: 166px;
+                color: White;
+                font-size: 12px;
+                padding-left: 14px;
+               padding-top: 1px;
+               line-height:14px;
+               padding-right:8px;
+        } 
+        
+         .rsk_pfl_inflation
+        {
+            color: #414343;
+            font-size: 14px;
+            font-weight: 600;
+            font-family: Calibri;
+            
+        }
+        
+      .textbox1
+        {
+            background: #5fa8c0;
+            border-radius: 10px;
+            height: 28px;
+            width: 80px;
+            line-height: 28px;
+            color: #fff;
+            font-size: 12px;
+            font-family: calibri;
+            border: none;
+        }
+        
+        .textbox2
+        {
+            background: #5fa8c0;
+            border-radius: 10px;
+            height: 28px;
+            width: 80px;
+            line-height: 28px;
+            color: #fff;
+            font-size: 12px;
+            font-family: calibri;
+            border: none;
+        }
+        .whitetext
+        {
+            background: #7ccce1;
+            font-family: calibri;
+            font-size: 14px;
+            color: #ffffff;
+            font-weight: bold;
+        }
+        
+        .recal
+        {
+            font-family: calibri;
+            background: url(../images/btn_bg.jpg) repeat-x;
+            color: #34679a;
+            border: 1px solid #b5daf5;
+            font-weight: 600;
+            font-size: 12px;
+            width: 90px;
+            height: 24px;
+            text-align: center;
+            cursor: pointer;
+            text-decoration: none;
+        }
+        
+         a.recal, a.recal:link, a.recal:visited, a.recal:active, a.recal:focus
+        {
+            font-family: calibri;
+            background: url(../images/btn_bg.jpg) repeat-x;
+            color: #34679a;
+            border: 1px solid #b5daf5;
+            font-weight: 600;
+            font-size: 12px;
+            width: 90px;
+            height: 30px;
+            text-align: center;
+            text-decoration: none;
+        }
+        
+  .TabSelect
+{
+	/*background-color:#DDF2F5;*/
+	font-family:calibri;
+	font-size:14px;
+	font-weight:bold;
+    color:#366E91;
+	height:15px;
+	text-align:center;
+	background-color:#B9DBE7;
+	border-bottom:1px solid #5fa8c0;
+	
+}
+
+.TabUnSelect
+{
+	background-color:#DDF2F5;
+	font-family:calibri;
+	font-size:14px;
+	font-weight:bold;
+	color:#434545;
+	height:15px;
+	text-align:center;
+}
+.Pointer
+{
+	cursor:pointer;
+}
+
+/*Style for Rupee Symbol*/
+@font-face 
+{
+	font-family:RupeeFont;
+	src: url("../images/Rupee.eot");		
+}
+@font-face 
+{
+	font-family:RupeeFont;
+	src: url("../images/Rupee.ttf");		
+}
+.rupee {/*font-family:RupeeFont;*/ font-family:calibri; font-weight:bold;  font-size:12px;}
+
+.rupee span {position:absolute;text-indent: -9999em;left:-9999em;}
+.rupeeNews span {display:none;}
+.rupeeNews {font-family:RupeeFont;font-size:12px;}
+/*End Style for Rupee Symbol*/	
+
+.TRBLPad10 tr td {padding: 3px !important;}
+.textbox1{height:25px !important;    width: 115px !important;}
+.textbox{width: 115px !important;}
+.resultMessageDiv{width:100%;}
+.resultMessage {width: 84%;margin-left: 8%; margin-bottom: 5px; margin-right: 8%;}
+
+.help-item-tooltip {width: 225px;}
+.view-display-id-tools .tooltip-inner {background-color: #5FA8C0;font-size: bold;}
+.view-display-id-tools .tooltip.right .tooltip-arrow {border-right: 5px solid #5FA8C0;}
+.view-display-id-tools .help-item-tooltip {width: 225px;}
+
+.description_text span:hover ~ div{display:block;}
+.description_text span ~ div{width: 231px; height: 33px;}

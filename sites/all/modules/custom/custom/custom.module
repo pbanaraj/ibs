@@ -1,0 +1,725 @@
+<?php
+require_once dirname(__FILE__).'/include/user_registration.inc';
+require_once dirname(__FILE__).'/include/override_site_map.inc';
+require_once dirname(__FILE__).'/include/call_and_trade.inc';
+require_once dirname(__FILE__).'/include/faqs.inc';
+require_once dirname(__FILE__).'/include/call_back_popup.inc';
+require_once dirname(__FILE__).'/include/email_us.inc';
+require_once dirname(__FILE__).'/include/world_indices.inc';
+require_once dirname(__FILE__).'/include/quote.inc';
+
+/*
+  * HOOK_MENU() Implement
+  */
+function custom_menu(){
+    $items = array();
+    $items['admin/manage/call-trade'] = array(
+        'title' => 'Call & Trade',
+     	'description' => 'Call & Trade Page',
+      	'page callback' => 'drupal_get_form',
+	    'page arguments' => array('getCallAndTradeForm'),
+	    'access arguments' => array('administer users'),
+	    'type' => MENU_NORMAL_ITEM,
+    );
+    
+    $items['call-trade/getinfo'] = array(
+        'title' => 'Information',
+        'page callback' => 'get_call_trade_info',
+        'access arguments' => array('access content'),
+        'type' => MENU_CALLBACK,
+    );
+    
+    $items['get/city'] = array(
+        'title' => 'Get City',
+        'page callback' => 'getCity',
+        'access arguments' => array('access content'),
+        'type' => MENU_CALLBACK,
+    );
+    
+    $items['why-sbi/%'] = array(
+        'title' => 'Get Why SBI',
+        'page callback' => 'getWhySbiData',
+        'access arguments' => array('access content'),
+        'type' => MENU_CALLBACK,
+    );
+    $items['why-sbi'] = array(
+        'title' => 'Get Why SBI',
+        'page callback' => 'getWhySbiData',
+        'access arguments' => array('access content'),
+        'type' => MENU_CALLBACK,
+    );
+    
+    $items['faq/search/%'] = array(
+        'title' => 'Get FAQ',
+        'page callback' => 'getFilterFaqs',
+        'page arguments' => array(1),
+        'access arguments' => array('access content'),
+        'type' => MENU_CALLBACK,
+    );
+    $items['faq/search'] = array(
+        'title' => 'Get FAQ',
+        'page callback' => 'getFilterFaqs',
+        'page arguments' => array(1),
+        'access arguments' => array('access content'),
+        'type' => MENU_CALLBACK,
+    );
+    $items['faq/categry/%'] = array(
+        'title' => 'Get FAQ',
+        'page callback' => 'getFilterFaqs',
+        'page arguments' => array(1),
+        'access arguments' => array('access content'),
+        'type' => MENU_CALLBACK,
+    );
+  	$items['edutainment/%'] = array(
+        'title' => 'Get Edutainment',
+        'page callback' => 'getFilterEdutainment',
+        'page arguments' => array(1),
+        'access arguments' => array('access content'),
+        'type' => MENU_CALLBACK,
+    );
+  	$items['callback/parent/%'] = array(
+  		'title' => 'Get Callaback',
+  		'page callback' => 'ajax_get_chield_call_back_data',
+  		'access arguments' => array('access content'),
+  		'type' => MENU_CALLBACK,
+  	);
+  	$items['callback/request'] = array(
+  		'title' => 'Get Callaback',
+  		'page callback' => 'custom_call_back_form_submit',
+  		'access arguments' => array('access content'),
+  		'type' => MENU_CALLBACK,
+  	);
+  	$items['callback/validate'] = array(
+  		'title' => 'Get Callaback',
+  		'page callback' => 'custom_call_back_form_validate',
+  		'access arguments' => array('access content'),
+  		'type' => MENU_CALLBACK,
+  	);
+    
+    $items['contactusemail'] = array(
+    	'title' => 'Contact Us Email',
+    	'page callback' => 'custom_email_us_form_test',
+    	'access callback' => array('access content'),
+    	'type' => MENU_CALLBACK,
+    );
+    $items['service/getmenu'] = array(
+    	'title' => 'Get Product and Service chield menu',
+    	'page callback' => 'ajax_get_chield_menu',
+    	'access arguments' => array('access content'),
+    	'type' => MENU_CALLBACK,
+    );
+    $items['quote/%'] = array(
+    	'title' => 'Get quote name',
+    	'page callback' => 'ajax_get_quote',
+    	'access arguments' => array('access content'),
+    	'type' => MENU_CALLBACK,
+    );
+    $items['quote/service/%/%'] = array(
+    	'title' => 'Get quote result',
+    	'page callback' => 'ajax_get_quote_result',
+    	'access arguments' => array('access content'),
+    	'type' => MENU_CALLBACK,
+    );
+    $items['contact/submit'] = array(
+    	'title' => 'Get contact us page',
+    	'page callback' => 'custom_email_us_form_submit',
+    	'access arguments' => array('access content'),
+    	'type' => MENU_CALLBACK,
+    );
+    $items['market/refresh'] = array(
+    	'title' => 'Get market refresh',
+    	'page callback' => 'getWorldIndices',
+    	'access arguments' => array('access content'),
+    	'type' => MENU_CALLBACK,
+    );
+    
+    $items['open-account'] = array(
+    	'title' => 'Open an account',
+    	'page callback' => 'custom_open_account',
+    	'access arguments' => array('access content'),
+    	'type' => MENU_CALLBACK,
+    );
+    
+    return $items;
+}
+
+function custom_theme() {
+  $items['user_register_form'] = array(
+      'render element' => 'form',
+      'template' => 'user_register_form',
+      'path' => drupal_get_path('module', 'custom') . '/templates',
+  );
+  $items['custom_email_us_form'] = array(
+  		'render element' => 'form',
+  		'template' => 'contact_us_form',
+  		'path' => drupal_get_path('module', 'custom') . '/templates',
+  );
+  
+  return $items;
+}
+
+function custom_preprocess_user_register_form(&$variables) {
+  // Shorten the form variable name for easier access.
+  $form = $variables['form'];
+ 
+  // Create variables for individual elements.
+  $variables['name'] = render($form['account']['name']);
+  $variables['email'] = render($form['account']['mail']);
+  $variables['mobileno'] = render($form['field__mobile_number']);
+  $variables['pincode'] = render($form['field_pin_code']);
+  $variables['city'] = render($form['field_city']);
+  $variables['product'] = render($form['field_wish_to_invest']);
+  $variables['citizenship'] = render($form['field_citizenship']);
+  $variables['captcha'] = render($form['captcha']);
+  
+  $variables['front_page'] = $form['front_page']['#default_value'];
+  $variables['quick_panel'] = $form['quick_panel']['#default_value'];
+  
+  $variables['submit'] = render($form['actions']);
+
+  // Be sure to print the remaining rendered form items.
+  $variables['children'] = drupal_render_children($form);
+}
+
+/*
+  * HOOK_PERMISSION() Implement
+  */
+function custom_permission() {
+  return array(
+    'access call and trade' => array(
+      'title' => t('Call & Trade'),
+      'description' => t('Perform administration tasks for my module.'),
+    ),
+  );
+}
+
+ /*
+  * HOOK_FORM_ALTER() Implement
+  */
+function custom_form_alter(&$form, &$form_state, $form_id) {
+    global $base_url; global $base_path;
+    if ($form_id == 'search_block_form') {
+    	$form['search_block_form']['#attributes']['placeholder'] = t('Search for News, Stocks & Companies');
+    }
+	/*if ($form_id == 'custom_email_us_form') {
+		//$form['#submit'][] = 'mymodule_upload_enabled_types_submit';
+    	//echo '<pre>'; print_r($form);exit;
+    }*/
+    if ($form_id == 'user_login') {
+    	$form['pass']['#attributes']['autocomplete'] = 'off';
+    }
+    if ($form_id == 'search_block_form') {
+    	$form['type'] = array(
+    		'#type' => 'select',
+    		'#title' => t('Country'),
+    		'#title_display' => 'invisible',
+    		'#options' => array('quote' => 'Quote', 'content' => 'Content'),
+    		'#attributes' => array('class' => array('searchSelectbox fontSemiBold')),
+    		'#validated' => true,
+    		'#prefix' => '<div class="searchSelectboxwrap">',
+    		'#suffix' => '</div>',
+    		'#weight' => 0	
+    	);
+    	$form[$form_id]['#suffix'] = '<div class="quote_result"></div><input type="hidden" name="company_code" value="'.$_POST['code'].'"><input type="hidden" name="type" value="'.$_POST['type'].'">';
+    	//echo '<pre>';print_r($form);exit;
+    }
+}  
+
+/**
+* Implements hook_block_info().
+*/
+function custom_block_info() {
+  $blocks = array();
+  $blocks['page_top_image'] = array(
+    'info' => t('Page Top Image'),
+  );
+  $blocks['regulation'] = array(
+    'info' => t('Regulation'),
+  );
+  $blocks['quicktab_registration'] = array(
+    'info' => t('Get user registration block'),
+  );
+  $blocks['call_trade'] = array(
+    'info' => t('Call and Trage'),
+  );
+  $blocks['why_sbi'] = array(
+    'info' => t('Why SBI Smart'),
+  );
+  $blocks['faq_taxonomy_term'] = array(
+    'info' => t('FAQ taxonomy terms'),
+  );
+  $blocks['faq_accodian'] = array(
+    'info' => t('FAQ Accodian Block'),
+  );
+  $blocks['edutainment_taxonomy_term'] = array(
+    'info' => t('Edutainment taxonomy terms'),
+  );
+  $blocks['statecity'] = array(
+    'info' => t('State City Drop Down'),
+  );
+  $blocks['contact_us_email_form'] = array(
+  	'info' => t('Contact Us Email Form'),
+  );
+  $blocks['world_indices'] = array(
+  	'info' => t('World Indices'),
+  );
+  return $blocks;
+}
+
+/**
+* Implements hook_block_view().
+*/
+function custom_block_view($delta = '') {
+  $block = array();
+  switch ($delta) {
+    case 'page_top_image':
+      $block['subject'] = '';
+      $block['content'] = getPageTopImage();
+      break;
+  case 'regulation':
+      $block['subject'] = '';
+      $block['content'] = getRegulationTab();
+      break;
+  case 'quicktab_registration':
+      $block['subject'] = '';
+      $block['content'] = getRegistrationBlock();
+      break;
+  case 'call_trade':
+      $block['subject'] = '';
+      $block['content'] = getCallTrade();
+      break;
+  case 'why_sbi':
+      $block['subject'] = '';
+      $block['content'] = getWhySbiData();
+      break;
+ case 'statecity':
+      $block['subject'] = '';
+      $block['content'] = getStateCityList();
+      break;
+ case 'faq_taxonomy_term':
+      $block['subject'] = '';
+      $block['content'] = getFaqTaxoTerms();
+      break;
+ case 'faq_accodian':
+      $block['subject'] = '';
+      $block['content'] = getFilterFaqs();
+      break;
+ case 'edutainment_taxonomy_term':
+      $block['subject'] = '';
+      $block['content'] = getEdutainmentTerms();
+      break;
+ case 'contact_us_email_form':
+      $block['subject'] = '';
+      $block['content'] = getContactUsEmailForm();
+      break;
+ case 'world_indices':
+      $block['subject'] = '';
+      $block['content'] = getWorldIndices();
+      break;
+  }
+  return $block;
+}
+
+/* 
+* Get the banner image for the page
+*/
+function getPageTopImage() {
+	global $base_url;
+	
+	$url = (isset($_SERVER['REDIRECT_URL']))? str_replace($base_url.'/',"",$_SERVER['REDIRECT_URL']):'';
+	$query = db_select('field_data_field_page_ulr', 'pu');
+	$query->join('node', 'n', 'pu.entity_id = n.nid');
+	$query->join('field_data_field_banner_text', 'bt', 'n.nid = bt.entity_id');
+	$query->join('file_usage', 'fu', 'bt.entity_id = fu.id');
+	$query->join('file_managed', 'fm', 'fu.fid = fm.fid');
+	$result = $query
+	  ->fields('pu', array('field_page_ulr_value'))
+	  ->fields('bt', array('field_banner_text_value'))
+	  ->fields('fm', array('uri'))
+	  ->condition('pu.field_page_ulr_value', $url, '=')
+	  //->condition('pu.field_page_ulr_value', $url.'%', 'LIKE')
+	  ->condition('n.status', 1, '=')
+	  ->range(0,1)
+	  ->execute();
+	foreach ($result as $data) {}
+	
+	$output = '';
+	if(isset($data)){
+		$output .= '<div class="row">';
+			$output .= '<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 siteFront pageFrontIcon" style="background: url('. file_create_url($data->uri) .') 0 0 no-repeat;">';
+				//$output .= '<div class="textonImage">'. $data->field_banner_text_value .'</div>';
+			$output .= '</div>';
+		$output .= '</div>';
+	}else{
+		if ($node = menu_get_object()) {
+		 	$nid = $node->nid;
+		 	
+		 	$query = db_select('field_data_field_banner_text', 'bt');
+			$query->join('field_data_field_select_page', 'sp', 'bt.entity_id = sp.entity_id');
+			$query->join('node', 'n', 'sp.entity_id = n.nid');
+			$query->join('file_usage', 'fu', 'n.nid = fu.id');
+			$query->join('file_managed', 'fm', 'fu.fid = fm.fid');
+			$result = $query
+			  ->fields('bt', array('field_banner_text_value'))
+			  ->fields('fm', array('uri'))
+			  ->condition('n.type', 'page_banner')
+			  ->condition('n.status', 1, '=')
+			  ->condition('sp.field_select_page_target_id', $nid, '=')
+			  ->range(0,1)
+			  ->execute();
+			  
+			  foreach ($result as $data) {
+		  		$output .= '<div class="row">';
+					$output .= '<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 siteFront pageFrontIcon" style="background: url('. file_create_url($data->uri) .') 0 0 no-repeat;">';
+						//$output .= '<div class="textonImage">'. $data->field_banner_text_value .'</div>';
+					$output .= '</div>';
+				$output .= '</div>';
+			  }
+		}
+	}
+  
+  return $output;
+}
+
+/* 
+* Get the data for Regulation tab
+*/
+function getStateCityList(){
+	$output = '';
+	$query = db_select('taxonomy_term_data', 'tt');
+	$query->join('taxonomy_term_hierarchy', 'th', 'tt.tid = th.parent');
+	$result = $query
+	  ->fields('tt', array('tid'))
+	  ->distinct()
+	  ->fields('tt', array('name'))
+	  ->condition('tt.vid', 8, '=')
+	  ->execute();
+	$output .= '<div class="row">';
+	$output .= '<form name="form" action="" method="post">';
+	$output .= '<label class="col-xs-12 selectLabel">Select Location</label>';
+	$output .= '<div class="col-sm-4 col-md-3">';
+	$output .= '<select class="customSelectbox fontSemiBold" name="state" id="state">';
+	$output .= '<option value="0">State</option>';
+	foreach ($result as $data) {
+		$output .= '<option value="'.$data->tid.'">'.$data->name.'</option>';
+	}  
+	$output .= '</select>';
+	$output .= '</div>';
+	$output .= '<div class="col-sm-4 col-md-3">';
+	$output .= '<select class="customSelectbox fontSemiBold" name="city" id="city">';  
+	$output .= '<option value="0">City</option>';
+	$output .= '</select>';
+	$output .= '</div>';
+	$output .= '<div class="col-sm-4 col-md-6">';
+	$output .= '<button class="btn btn-default selectBtn fontSemiBold" id="getCity" name="Go">Go</button>';
+	$output .= '</div>';
+	$output .= '</form>';
+	$output .= '</div>';
+	
+	return $output;
+}
+
+/* 
+* Get the list of city
+*/
+function getCity(){
+	$state = $_POST['state'];
+	$output = '';
+	if($state > 0){
+		$query = db_select('taxonomy_term_data', 'tt');
+		$query->join('taxonomy_term_hierarchy', 'th', 'tt.tid = th.tid');
+		$result = $query
+		  ->fields('tt', array('tid'))
+		  ->fields('tt', array('name'))
+		  ->condition('tt.vid', 8, '=')
+		  ->condition('th.parent', $state, '=')
+		  ->execute();
+		foreach ($result as $data) {
+			$output .= '<option value="'.$data->tid.'">'.$data->name.'</option>';
+		}
+		echo $output; 
+	}else{
+		echo '<option>City</option>';
+	}
+}
+
+/* 
+* Get the data for Regulation tab
+*/
+function getRegulationTab(){
+  global $base_url;
+  $module_path = drupal_get_path('module', 'custom');
+  drupal_add_js($base_url . '/' . $module_path . '/regulatory_corner.js');
+	$output = '';
+	$content = array();
+	$ids = array();
+	$query = db_select('node', 'n');
+	$query->join('field_data_field_tab', 'ft', 'n.nid = ft.entity_id');
+	$query->join('field_data_field_order', 'fo', 'ft.entity_id = fo.entity_id');
+	$query->join('field_data_field_select_category', 'sc', 'fo.entity_id = sc.entity_id');
+	$query->join('taxonomy_term_data', 'td', 'sc.field_select_category_target_id = td.tid');
+	$result = $query
+	  ->fields('n', array('nid'))
+	  ->fields('n', array('title'))
+	  ->fields('sc', array('field_select_category_target_id'))
+	  ->fields('td', array('name', 'tid'))
+	  ->condition('n.type', 'regularity_corner', '=')
+	  ->condition('ft.field_tab_value', 'regulation', '=')
+	  ->condition('n.status', 1, '=')
+	  ->orderBy('td.weight', 'ASC')//ORDER BY created
+	  ->orderBy('fo.field_order_value', 'ASC')//ORDER BY created
+	  ->execute();
+	foreach ($result as $data) {
+		$ids[$data->tid][] = $data->nid;
+		$content[$data->tid][$data->nid]['title'] = $data->title;
+		$cate_name[$data->tid] = $data->name;
+		
+		$query = db_select('field_data_field_doc_link', 'dl');
+		$links = $query
+		->fields('dl', array('field_doc_link_url', 'field_doc_link_title'))
+		->fields('dl', array('entity_id'))
+		->condition('dl.entity_id', $data->nid, '=')
+		->execute();
+		
+		foreach ($links as $link) {
+			$lnks[$data->nid][] = array('text' => $link->field_doc_link_title, 'url' => $link->field_doc_link_url, 'categry_id' => $data->tid);
+		} ;
+	}
+	
+	$count = 1;
+	foreach($ids as $catgory => $nod){ //echo $catgory.'<br>';
+		
+	   $query = db_select('file_usage', 'fu');
+	   $query->join('file_managed', 'fm', 'fu.fid = fm.fid');
+	   $query->join('field_data_field_upload_file', 'uf', 'fm.fid = uf.field_upload_file_fid');
+	   $result = $query
+		  ->fields('uf', array('field_upload_file_description'))
+		  ->fields('fm', array('uri'))
+		  ->fields('fu', array('id'))
+		  ->condition('fu.id', $nod, 'in')
+		  ->execute();
+		foreach ($result as $data) { 
+			$id = $data->id;
+			$content[$catgory][$data->id]['file'][] = array('lable' => $data->field_upload_file_description, 'file_url' => file_create_url($data->uri));
+			$content[$catgory][$data->id]['links'] = $lnks[$id];
+		}
+		if($count == 1){
+			foreach ($lnks as $key => $ln) {
+				$content[$ln[0]['categry_id']][$key]['links'] = $ln;
+			}
+		}
+		
+		$hidden_class = '';
+	    $output .= '<div class="well well-sm">';
+        $output .= '<p class="arrow-dark fontBold">'.t($cate_name[$catgory]).'</p>';
+        $output .= '<hr class="' . $hidden_class . '">';
+        $output .= '<div class="row sitcont ' . $hidden_class . '">';
+        
+        foreach($content[$catgory] as $key => $value){
+        	$output .= '<div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">';
+        		$output .= '<ul class="lists">';
+        			$output .= '<li class="cmn head_li"><a>'. $value['title'] .'</a></li>';
+        			foreach($value['links'] as $file){
+        				$output .= '<li class="list_li"><a href="'. $file['url'] .'" target="_blank">'. $file['text'] .'</a></li>';
+        			}
+        			foreach($value['file'] as $file){
+        				$output .= '<li class="list_li"><a href="'. $file['file_url'] .'" target="_blank">'. $file['lable'] .'</a></li>';
+        			}
+        		$output .= '</ul>';
+        	$output .= '</div>';
+        }
+        
+        
+        $output .= '</div>';
+	    $output .= '</div>';
+        $count++;
+    }
+    
+	return $output;
+}
+
+
+/*
+* Get user registration Block
+*/
+
+function getRegistrationBlock(){
+  global $user;
+  if ($user->uid > 0) {
+    $form = '<div>You have already logged in. Logged in user can not do registration process.</div>';
+  } else {
+    $form = drupal_get_form('user_register_form');
+  }
+  
+	return $form;
+}
+
+
+/*
+* Get Why SBI data
+*/
+
+function getWhySbiData(){
+	$output = '<img class="loading" src="sites/all/themes/sbicap/common/images/loading-small.gif" style="display:none;">';
+	$node = array();
+	
+	$param = strtolower(trim(arg(1)));
+	$ids = get_node_queue_custom('why_sbismart');
+	$nodes = node_load_multiple($ids, array('type' => 'why_sbi_smart'));
+	$count = 1;
+	$total = 0;
+	foreach ($nodes as $key => $info) { 
+		if(($param != '') && (arg(0) == 'why-sbi')){
+			if ((strstr(strtolower($info->title), $param) || strstr(strtolower(strip_tags($info->body['und'][0][value])), $param)) || (strstr(strtolower($info->title), $param) && strstr(strtolower(strip_tags($info->body['und'][0][value])), $param))){
+				$node[] = $info;
+				$total++;
+			}
+		}else{
+			$node[] = $info;
+		}
+	}
+	$count = (count($node) >= 3)? ceil((float) count($node)/3):1;
+	$rout = 1;
+	for ($i =1 ; $i <= $count; $i++) {
+		$output .= '<div class="why-sbi-section">';
+			$output .= '<div class="why-sbi-section-inner">';
+			$step = ((count($node)-$rout) >= 3)? (3*$i) : ($rout + (count($node)- $rout)) ;
+			for ($c =$rout ; $c <= $step; $c++) {
+				$output .= '<div class="col-sm-4 why-sbi-nav" id="'.str_replace('/', '-', drupal_get_path_alias('node/'.$node[$c-1]->nid)).'">';
+					$output .= '<div class="sbi-section-holder">';
+						$output .= '<div class="row">';
+							$output .= '<div class="col-sm-4 col-xs-4">';
+								$output .= '<img src="'.file_create_url($node[$c-1]->field_whats_ne_banner['und'][0]['uri']).'" alt="Mobile" class="img-responsive why-sbi-img">';
+							$output .= '</div>';
+							$output .= '<div class="col-sm-8  col-xs-8">';
+								$output .= '<h1 class="why-sbi-sect-tit">'.$node[$c-1]->title.'</h1>';
+							$output .= '</div>';
+						$output .= '</div>';
+						$output .= '<div class="row">';
+							$output .= '<div class="col-sm-12">';
+								$output .= '<p class="why-sbi-sect-para">';
+									$output .= strip_tags($node[$c-1]->body['und'][0]['summary']);
+								$output .= '</p>';
+							$output .= '</div>';
+						$output .= '</div>';
+						$output .= '<span class="why-sbi-arw"> </span>';
+					$output .= '</div>';
+				$output .= '</div>';
+			}	
+		
+				$output .= '<div class="why-sbi-section-desc ">';
+					$output .= '<div class="why-sbi-section-desc-inner">';
+						$output .= '<div class="col-sm-12">';
+						
+						for ($c =$rout ; $c <= $step; $c++) {
+							$output .= '<div class="cnt-desc-section default-open" style="display: none;">';
+								$output .= '<div class="row">';
+									$output .= '<div class="col-sm-7">';
+										$output .= '<h1 class="main-dsc-tit">'.$node[$c-1]->title.'</h1>';
+									$output .= '</div>';
+									$output .= '<div class="col-sm-5">';
+										$output .= '<a class="why-sbi-open-acc" href="javaScript:void(0);">'.t('OPEN AN ACCOUNT NOW').'</a>';
+									$output .= '</div>';
+								$output .= '</div>';
+								$output .= '<span class="why-sbi-close">X</span>';
+								$output .= '<div class="row">';
+									$output .= '<div class="col-sm-12">';
+										$output .= $node[$c-1]->body['und'][0]['value'];
+									$output .= '</div>';
+								$output .= '</div>';
+							$output .= '</div>';
+						}
+						$rout = $c	;
+						$output .= '</div>';
+					$output .= '</div>';
+				$output .= '</div>';
+		
+			$output .= '</div>';
+		$output .= '</div>';
+		
+	}
+	
+	if(arg(0) == 'why-sbi'){
+		$output .= (($total == 0) && ($param != ''))?"<p align='center' class='no-result'>Search result not found.</p>":'';
+		$output .= "<script type='taxt/javascript'>jQuery('.why-sbi-section-inner .why-sbi-nav').on('click', function() {
+					var ind = jQuery(this).index();
+					jQuery(this).children('.sbi-section-holder').addClass('active').parent().siblings().children().removeClass('active')
+					console.log(ind)
+					jQuery(this).siblings('.why-sbi-section-desc').children('.why-sbi-section-desc-inner').find('.cnt-desc-section').eq(ind).show().siblings().hide()
+				})
+				
+				jQuery('.why-sbi-close').on('click',function(){
+					jQuery(this).parent('.cnt-desc-section').hide()
+					jQuery(this).parents('.why-sbi-section-desc').siblings('.why-sbi-nav').children('.sbi-section-holder').removeClass('active')
+				})</script>";
+				
+		echo $output;
+	}else{
+		return $output;
+	}
+}
+
+
+function getEdutainmentTerms(){
+	$ids = get_node_queue_custom('edutainment');
+	$nodes = node_load_multiple($ids, array('type' => 'edutainment'));
+	$vocabulary = taxonomy_vocabulary_machine_name_load('edutainment');
+	$termObjs = taxonomy_get_tree($vocabulary->vid); 
+	
+	foreach($termObjs as $termObj){ 
+		$data[$termObj->tid] = $termObj->name;
+	}
+	
+	$output = '<div class="edutainment-rt-container">';
+	$count = 0;
+	foreach($nodes as $info){
+		$active = ($count)?'':'active';
+		$output .= '<div class="rt-cont-list '.$active.'" id="/edutainment/'.$info->field_category['und'][0]['tid'].'">'.$data[$info->field_category['und'][0]['tid']].' <span class="rt-vid-lft-arw"> </span></div>';
+		$count++;
+	}
+	$output .= '</div>';
+		
+	return $output;
+}
+
+function getFilterEdutainment(){
+	echo views_embed_view('edutainment', 'block_1', arg(1));
+}
+
+function ajax_get_chield_menu(){
+	$menu = views_embed_view('chield_menu_for_product_service', $display_id = 'chield_product_service');
+	$block = block_custom_block_get(10);
+	$content = $block['body'];
+	
+	$output ='<div class="dropdown-menu" id="headerDropdown">
+	<div class="dropdownInner">
+	<h3 class="dropdownTitle fontBold padDiv hidden-xs">Products &amp; Services</h3>
+	<div class="row">
+	<div class="col-xs-12 col-sm-6">'.$menu.'
+	</div>
+	<div class="col-xs-12 hidden-xs col-sm-6">'.$content.' 
+	</div>
+	</div>
+	</div>
+	</div>';
+	
+	echo $output;
+}
+
+/* HOOK_CRON function */
+function custom_cron() {
+	
+	$result = db_query('truncate table cache_form');
+	
+}
+
+
+function custom_open_account($form,&$form_state){
+  global $user;
+  if ($user->uid > 0) {
+    $form = '<div>You have already logged in. Logged in user can not do registration process.</div>';
+  } else {
+    $form = drupal_get_form('user_register_form');
+  }
+  return $form;
+ }

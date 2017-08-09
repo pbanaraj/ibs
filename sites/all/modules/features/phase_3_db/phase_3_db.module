@@ -1,0 +1,7 @@
+<?php
+/**
+ * @file
+ * Code for the Phase 3 Db feature.
+ */
+
+include_once 'phase_3_db.features.inc';

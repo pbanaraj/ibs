@@ -1,0 +1,299 @@
+<?php
+/**
+ * @file
+ * Download related functionalities.
+ */
+ 
+
+/**
+ * Implements hook_block_info().
+ */
+function people_block_info() {
+  $blocks = array();
+  $blocks['people_page'] = array(
+    'info' => t('People page content'),
+    'visibility' => BLOCK_VISIBILITY_LISTED,
+    'pages' => 'people',
+    'region' => 'content',
+  );  
+  
+  $blocks['board_director'] = array(
+  		'info' => t('Board of Director'),
+  );
+  $blocks['management_team'] = array(
+  		'info' => t('Management Team'),
+  );
+  
+  return $blocks;
+}
+
+
+/**
+ * Implements hook_block_view().
+ */
+function people_block_view($delta = '') {
+  $block = array();
+
+  switch ($delta) {
+    case 'people_page':
+      $block['content'] = theme('get_people_content');
+      break;
+    case 'board_director':
+      	$block['subject'] = '';
+      	$block['content'] = getBoardOfDirector();
+      	break;
+    case 'management_team':
+      	$block['subject'] = '';
+      	$block['content'] = getManagementTeam();
+      	break;
+  }
+  return $block;
+}
+
+/**
+ * Implements hook_theme().
+ */
+function people_theme($existing, $type, $theme, $path) {
+  global $base_url;
+  if (drupal_match_path(drupal_get_path_alias(), 'people')) {
+    
+  }
+  $module_path = $base_url . '/' . drupal_get_path('module', 'people');
+  return array(
+    'get_people_content' => array(
+      'variables' => array(),
+      'template' => 'theme/people'
+    ),
+  );
+}
+
+
+function getBoardOfDirector(){
+	$output = '';
+	$node = array();
+	
+	$ids = get_node_queue_custom('board_of_director');
+	$nodes = node_load_multiple($ids, array('type' => 'people'));
+	$count = 1;
+	foreach ($nodes as $key => $info) {
+		if($info->field_designation_type['und'][0]['value'] == 'Board of Directors'){
+			$node[$count] = $info;
+			$count++;
+		}
+	}
+	$count = (count($node) >= 3)? ceil((float) count($node)/3):1;
+	$rout = 1;
+	//echo '<pre>'; print_r($node);
+	for ($i =1 ; $i <= $count; $i++) {
+		$output .= '<div class="people-listing">';
+		$output .= '<div class="row">';
+		$step = ((count($node)-$rout) >= 3)? (3*$i) : ($rout + (count($node)- $rout)) ;
+		for ($c =$rout ; $c <= $step; $c++) {
+			$output .= '<div class="col-sm-4 people-listing-holder">';
+				$output .= '<div class="people-listing-inner">';
+					$output .= '<div class="row">';
+						$output .= '<div class="col-sm-4 col-xs-12">';
+							$output .= '<div class="people-listing-lft">';
+								$output .= '<img alt="PEOPLE" src="'.file_create_url($node[$c]->field_demo_thumbnail['und'][0]['uri']).'" class="img-responsive">';
+							$output .= '</div>';
+						$output .= '</div>';
+						$output .= '<div class="col-sm-8 col-xs-12 no-pad">';
+							$output .= '<div class="people-listing-rt">';
+								$output .= '<h4>'.$node[$c]->title.'</h4>';
+								$output .= '<p class="sub-p">'.$node[$c]->field_link['und'][0]['value'].'</p>';
+								$output .= '<p class="people-desc">'.substr(strip_tags($node[$c]->body['und'][0]['summary']), 0, 40).'</p>';
+								$output .= '<p class="more-link">
+									<a href="javaScript:;">More..</a>
+								</p>';
+							$output .= '</div>';
+						$output .= '</div>';
+						$output .= '<span class="people-act-arw"> </span>';
+					$output .= '</div>';
+				$output .= '</div>';
+			$output .= '</div>';
+		}
+	
+		$output .= '<div class="col-sm-12 people-description-holder">';
+		
+		$num = $rout;
+		for ($c =$num ; $c <= $step; $c++) {
+			$output .= '<div class="people-description-container" style="display: none;">';
+			$output .= '<div class="row desc-tit-cont">';
+				$output .= '<div class="col-sm-9">';
+					$output .= '<h4>'.$node[$c]->title.'</h4>';
+					$output .= '<h4> '.$node[$c]->field_link['und'][0]['value'].' </h4>';
+				$output .= '</div>';
+				$output .= '<div class="col-sm-3">';
+					$output .= '<div class="people-desc-close">
+						X
+					</div>';
+				$output .= '</div>';
+			$output .= '</div>';
+			$output .= '<div class="row">';
+				$output .= '<div class="col-sm-12">';
+					$output .= '<div class="people-lg-desc-cont">';
+						$output .= '<div class="col-sm-2">';
+							$output .= '<div class="row">';
+								$output .= '<div class="col-sm-12">';
+									$output .= '<img alt="PEOPLE" src="'.file_create_url($node[$c]->field_demo_thumbnail['und'][0]['uri']).'" class="img-responsive">';
+								$output .= '</div>';
+							$output .= '</div>';
+							$output .= '<div class="row">';
+								$output .= '<div class="col-sm-12">';
+									$output .= '<div class="people-social-icons">';
+									if(isset($node[$c]->field_links['und'][0]['value'])){
+										$output .= '<div><a href="'.$node[$c]->field_links['und'][0]['value'].'"></a></div>';
+									}
+									if(isset($node[$c]->field_tag['und'][0]['value'])){
+										$output .= '<div><a href="skype:'.$node[$c]->field_tag['und'][0]['value'].'?call"></a></div>';
+									}
+									if(isset($node[$c]->field_order['und'][0]['value'])){
+										$output .= '<div><a href="'.$node[$c]->field_order['und'][0]['value'].'"></a></div>';
+									}
+									$output .= '</div>';
+								$output .= '</div>';
+							$output .= '</div>';
+						$output .= '</div>';
+						$output .= '<div class="col-sm-10">';
+							$output .= '<div class="people-lg-desc-txt">';
+								$output .= $node[$c]->body['und'][0]['value'];
+							$output .= '</div>';
+						$output .= '</div>';
+					$output .= '</div>';
+				$output .= '</div>';
+			$output .= '</div>';
+		$output .= '</div>';
+		}
+		$rout = $c	;
+		
+		$output .= '</div>';
+		$output .= '</div>';
+		$output .= '</div>';
+	
+	}
+	
+	echo $output;
+}
+
+function getManagementTeam(){
+	$output = '';
+	$node = array();
+
+	$ids = get_node_queue_custom('management_team');
+	$nodes = node_load_multiple($ids, array('type' => 'people'));
+	$count = 1;
+	foreach ($nodes as $key => $info) {
+		if($info->field_designation_type['und'][0]['value'] == 'Management Team'){
+			$node[$count] = $info;
+			$count++;
+		}
+	}
+	$count = (count($node) >= 3)? ceil((float) count($node)/3):1;
+	$rout = 1;
+	//echo '<pre>'; print_r($node);
+	for ($i =1 ; $i <= $count; $i++) {
+		$output .= '<div class="people-listing">';
+		$output .= '<div class="row">';
+		$step = ((count($node)-$rout) >= 3)? (3*$i) : ($rout + (count($node)- $rout)) ;
+		for ($c =$rout ; $c <= $step; $c++) {
+			$output .= '<div class="col-sm-4 people-listing-holder">';
+			$output .= '<div class="people-listing-inner">';
+			$output .= '<div class="row">';
+			$output .= '<div class="col-sm-4 col-xs-12">';
+			$output .= '<div class="people-listing-lft">';
+			$output .= '<img alt="PEOPLE" src="'.file_create_url($node[$c]->field_demo_thumbnail['und'][0]['uri']).'" class="img-responsive">';
+			$output .= '</div>';
+			$output .= '</div>';
+			$output .= '<div class="col-sm-8 col-xs-12 no-pad">';
+			$output .= '<div class="people-listing-rt">';
+			$output .= '<h4>'.$node[$c]->title.'</h4>';
+			$output .= '<p class="sub-p">'.$node[$c]->field_link['und'][0]['value'].'</p>';
+			$output .= '<p class="people-desc">'.substr(strip_tags($node[$c]->body['und'][0]['summary']), 0, 40).'</p>';
+			$output .= '<p class="more-link">
+									<a href="javaScript:;">More..</a>
+								</p>';
+			$output .= '</div>';
+			$output .= '</div>';
+			$output .= '<span class="people-act-arw"> </span>';
+			$output .= '</div>';
+			$output .= '</div>';
+			$output .= '</div>';
+		}
+
+		$output .= '<div class="col-sm-12 people-description-holder">';
+
+		$num = $rout;
+		for ($c =$num ; $c <= $step; $c++) {
+			$output .= '<div class="people-description-container" style="display: none;">';
+			$output .= '<div class="row desc-tit-cont">';
+			$output .= '<div class="col-sm-9">';
+			$output .= '<h4>'.$node[$c]->title.'</h4>';
+			$output .= '<h4> '.$node[$c]->field_link['und'][0]['value'].' </h4>';
+			$output .= '</div>';
+			$output .= '<div class="col-sm-3">';
+			$output .= '<div class="people-desc-close">
+						X
+					</div>';
+			$output .= '</div>';
+			$output .= '</div>';
+			$output .= '<div class="row">';
+			$output .= '<div class="col-sm-12">';
+			$output .= '<div class="people-lg-desc-cont">';
+			$output .= '<div class="col-sm-2">';
+			$output .= '<div class="row">';
+			$output .= '<div class="col-sm-12">';
+			$output .= '<img alt="PEOPLE" src="'.file_create_url($node[$c]->field_demo_thumbnail['und'][0]['uri']).'" class="img-responsive">';
+			$output .= '</div>';
+			$output .= '</div>';
+			$output .= '<div class="row">';
+			$output .= '<div class="col-sm-12">';
+			$output .= '<div class="people-social-icons">';
+			if(isset($node[$c]->field_links['und'][0]['value'])){
+				$output .= '<div><a href="'.$node[$c]->field_links['und'][0]['value'].'"></a></div>';
+			}
+			if(isset($node[$c]->field_tag['und'][0]['value'])){
+				$output .= '<div><a href="skype:'.$node[$c]->field_tag['und'][0]['value'].'?call"></a></div>';
+			}
+			if(isset($node[$c]->field_order['und'][0]['value'])){
+				$output .= '<div><a href="'.$node[$c]->field_order['und'][0]['value'].'"></a></div>';
+			}
+			$output .= '</div>';
+			$output .= '</div>';
+			$output .= '</div>';
+			$output .= '</div>';
+			$output .= '<div class="col-sm-10">';
+			$output .= '<div class="people-lg-desc-txt">';
+			$output .= $node[$c]->body['und'][0]['value'];
+			$output .= '</div>';
+			$output .= '</div>';
+			$output .= '</div>';
+			$output .= '</div>';
+			$output .= '</div>';
+			$output .= '</div>';
+		}
+		$rout = $c	;
+
+		$output .= '</div>';
+		$output .= '</div>';
+		$output .= '</div>';
+
+	}
+
+	echo $output;
+}
+
+
+function get_node_queue_custom($name){
+	$query = db_select('nodequeue_queue', 'nq');
+	$query->join('nodequeue_nodes', 'nn', 'nq.qid = nn.qid');
+	$result = $query
+	->fields('nn', array('nid'))
+	->condition('nq.name', $name, '=')
+	->orderBy('nn.position', 'ASC')
+	->execute();
+	foreach ($result as $data) {
+		$nids[] = $data->nid;
+	}
+	
+	return $nids;
+}

@@ -1,0 +1,95 @@
+<?php
+
+/**
+ * @file
+ * Implementation on Notifications.
+ */
+/**
+ * Implements hook_menu()
+ */
+function sbicap_notifications_menu() {
+  $items['admin/config/user-interface/notifications'] = array(
+    'title' => 'Configure Notification Settings',
+    'description' => 'Configures notification settings.',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('sbicap_notifications_admin_form'),
+    'access arguments' => array('administer content search'),
+    'file' => 'sbicap_notifications.admin.inc',
+    'type' => MENU_NORMAL_ITEM,
+    'weight' => 2,
+  );
+  return $items;
+}
+
+/**
+ * Implements hook_block_info().
+ */
+function sbicap_notifications_block_info() {
+  $blocks = array();
+  $blocks['sbicap_notifications'] = array(
+    'info' => t('SBICAP Notifications.'),
+  );
+  return $blocks;
+}
+
+/**
+ * Implements hook_block_view().
+ */
+function sbicap_notifications_block_view($delta='') {
+  $block = array();
+
+  switch($delta) {
+    case 'sbicap_notifications' :
+      $block['content'] = _get_sbicap_notifications();
+      break;
+  }
+  return $block;
+}
+
+/**
+ * Implements hook_theme().
+ */
+function sbicap_notifications_theme($existing, $type, $theme, $path) {
+  return array(
+    'sbicap_notifications' => array(
+      'variables' => array(
+        'nodes' => array(),
+      ),
+      'template' => 'templates/sbicap-notifications'
+    ),
+  );
+}
+
+/**
+ * Custom function to get all Notification lists.
+ */
+function _get_sbicap_notifications() {
+  global $base_url;
+  $global_time = variable_get('global_time', 0);
+  $item_stay_time = variable_get('item_stay_time', 0);
+  $items_open_time = variable_get('items_open_time', 0);
+  $item_speed = variable_get('item_speed', 0);
+
+  $notification_settings = array(
+    'global_time' => $global_time,
+    'item_stay_time' => $item_stay_time,
+    'items_open_time' => $items_open_time,
+    'item_speed' => $item_speed,
+  );
+  // Sets the notification settings to drupal settings variable.
+  drupal_add_js(array('sbicap_notifications' => $notification_settings), 'setting');
+
+  drupal_add_library('system', 'jquery.cookie');
+  $module_path = drupal_get_path('module', 'sbicap_notifications');
+  //drupal_add_js($base_url . '/' . $module_path . '/js/sbicap_notifications.js');
+  drupal_add_js( $module_path . '/js/sbicap_notifications.js', array('scope' => 'footer', 'weight' => 10));
+  
+  $query = db_select('nodequeue_types', 'nqt');
+  $query->join('nodequeue_nodes', 'nqn', 'nqt.qid = nqn.qid');
+  $query->fields('nqn', array('sqid'));
+  $query->condition('nqt.type', 'sbi_notifications');
+  $sqid = $query->execute()->fetchField();
+
+  $notification_nodes = nodequeue_load_nodes($sqid, $backward = FALSE, $from = 0, $count = 0, $published_only = TRUE);
+  return theme('sbicap_notifications', array('nodes' => $notification_nodes));
+}

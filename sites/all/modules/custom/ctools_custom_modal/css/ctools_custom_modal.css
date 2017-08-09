@@ -1,0 +1,66 @@
+/*
+To change this license header, choose License Headers in Project Properties.
+To change this template file, choose Tools | Templates
+and open the template in the editor.
+*/
+/* 
+    Created on : 25 May, 2016, 7:23:55 PM
+    Author     : ganesan.g
+*/
+
+div.ctools-modal-content .modal-content {
+    padding: 1em 1em 1em 1em;
+    overflow: auto;
+    position: relative;
+    max-height: 600px;
+}
+.modal-header{ border-bottom:none !important}
+
+div.ctools-modal-content .modal-header {
+    background-color: #fff;
+    padding: 0.7em .25em 0.7em 1em;
+}
+div.ctools-modal-content .modal-title {
+    font-size: 120%;
+    font-weight: bold;
+    color: #333;
+    overflow: hidden;
+    white-space: nowrap;
+}
+a.close{color: #000 !important; margin-right: 15px; font-size: 22px; font-weight: bold;}
+.modal-content{ border-radius:0 !important}
+.modal-content{ box-shadow: none !important}
+.close-container{ width: 100%; text-align: center; margin-top: 25px;}
+.close-btn {    
+    padding: 7px 15px;
+    background: #ccc;
+    text-transform: uppercase; 
+    background: #164582; 
+    color: #fff; 
+    text-decoration: none;   
+}
+
+#modalContent {
+  position: fixed !important;
+  top: 12% !important;
+  bottom: 12% !important;
+  right: 4% !important;
+  left: 4% !important;
+}
+/* Limit max width to 800px */
+div.ctools-modal-content {
+  width: 100% !important;
+  margin: 0 auto;
+  max-width: 800px;
+  border: 0;
+}
+div.ctools-modal-content .modal-content {
+  width: 100% !important;
+}
+div.ctools-modal-form-content {
+  max-width: 1000px;
+}
+
+.ctools-close-modal.close-btn.ctools-close-modal-processed{color: #fff; outline: none; text-decoration: none}
+
+.ctools-close-modal.close-btn.ctools-close-modal-processed:hover{color: #fff;outline: none; text-decoration: none}

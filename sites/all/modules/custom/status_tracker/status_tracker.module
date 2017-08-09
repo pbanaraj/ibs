@@ -1,0 +1,207 @@
+<?php
+
+include_once DRUPAL_ROOT . '/includes/bootstrap.inc';
+include_once DRUPAL_ROOT . '/nusoap/lib/nusoap.php';
+drupal_bootstrap(DRUPAL_BOOTSTRAP_FULL);
+global $base_url; 
+ 
+//Implement hook_menu()
+function status_tracker_menu(){
+	$items['aot-form'] = array(
+    'title' => t('Account Opening Status Tracker'),
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('account_opening_status_form'),
+    'access arguments' => array('access content'),
+    'type' => MENU_NORMAL_ITEM,
+  );
+	
+	$items['lst-form'] = array(
+    'title' => t('Lead Status Tracker'),
+	  'description' => '',
+	  'page callback' => 'drupal_get_form',
+    'page arguments' => array('lead_status_tracker_form'),
+	  'access arguments' => array('access content'),
+    'type' => MENU_NORMAL_ITEM,
+  );
+  
+  $items['inb-form'] = array(
+    'title' => t('Internet Banking Service Tracker'),
+    'description' => 'Have you submitted your contact details on',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('internet_banking_service_tracker_form'),
+    'access arguments' => array('access content'),
+    'type' => MENU_NORMAL_ITEM,
+  );
+  
+	return $items;
+}
+//Implement FORM API
+function account_opening_status_form($form, &$form_state){
+  $form['desc'] = array(
+	'#type' => 'item',
+	'#markup' => 'Have you submitted a duly filled form to open an account to our sales representative and want to know the status on it?<br />
+				  Enter the details below and get a quick update on the status of the opening of your account.<br />
+				  If you find the form is on hold for some reason or your account has not been opened for more than a fortnight, please contact our customer care on '.l('Contact Us','contact-us'),
+  );
+  
+  $form['app_no'] = array(
+	'#type' => 'textfield',
+	'#title' => t('Enter Application Number'),
+	'#required' => TRUE,
+  );
+  $form['pan_no'] = array(
+	'#type' => 'textfield',
+	'#title' => t('Enter PAN Number'),
+	'#maxlength' => 10,
+	'#required' => TRUE,
+  );
+  $form['message'] = array(
+    '#type' => 'item',
+	'#prefix' => '<div id="aost">',
+    '#markup' => !empty($form_state['actions']['message']) ? $form_state['actions']['message'] : '',
+	'#suffix' => '</div>',	
+  );
+  $form['submit'] = array(
+    '#type' => 'submit',
+    '#value' => t('submit'),	
+  );
+  return $form;
+}
+
+function account_opening_status_form_submit($form, &$form_state) {
+
+	$client = new SoapClient("https://app.sbismart.com/sslwebservices/ssl.asmx?WSDL");
+	   try {
+       $strWeather = $client->ClientStatus(array('refid'=>$_POST['app_no'],'IdentityProof' => $_POST['pan_no']))->ClientStatusResult;
+       $response = $strWeather->any;
+       $xml = new SimpleXMLElement($response);
+       if($xml->RecordFound == 'True'){
+              $accstatus = $xml->AccountStatus;
+			  $message = 'Your account status is ' . $accstatus . '.';
+			  $status = 'status';
+        } else{
+		      $message = 'You have entered wrong details! Please try again or contact our customer care executive.';
+			  $status = 'error';
+	    }
+		
+   }
+   catch (SoapFault $ex){
+        $message = "Some error occured. Please try again.";
+		$status = 'error';
+     } 
+	 drupal_set_message($message, $status);
+}
+
+function account_opening_status_form_validate($form, &$form_state){
+	if(!empty($form_state['values']['pan_no'])){
+			if (!preg_match("/^([a-zA-Z]){5}([0-9]){4}([a-zA-Z]){1}?$/", $form_state['values']['pan_no'])) { 
+			form_set_error("submitted][pan_no", 'PAN no, should be in correct format');        
+		}
+	}	
+}
+
+function lead_status_tracker_form($form, &$form_state){
+  
+  $form['desc'] = array(
+	'#type' => 'item',
+	'#markup' => 'Have you submitted your contact details on '. l('Open Account','', array('attributes'=> array('class'=>array('register'))))." to be contacted by our sales representative for opening an account and want to know the status?<br />Chances are you won't need to check this as we generally initiate contact in a maximum of 2 days from the submission of your request. But if you have missed a call from us or were not reachable, you can get a quick update by entering your details below.<br /><br />
+
+    In the unlikely event of you not getting serviced to your satisfaction, please feel free to contact our customer care on ".l('Contact Us','contact-us'),
+  );
+  $form['phone_no'] = array(
+	'#type' => 'textfield',
+	'#title' => t('Phone Number'),
+	'#required' => TRUE,
+  );
+  $form['submit'] = array(
+    '#type' => 'submit',
+    '#value' => t('submit'),
+  );
+  return $form;
+}
+
+function lead_status_tracker_form_validate($form, &$form_state){
+	if(!empty($form_state['values']['phone_no'])){
+		if(!preg_match('/^\d{10}$/', $form_state['values']['phone_no']) ) {
+			 form_set_error('phone_number', 'Please enter a valid phone number');
+		}
+	}		
+}
+
+function lead_status_tracker_form_submit($form, &$form_state){
+	  # Do some SOAP / Call a Web Service
+       $client1 = new SoapClient("https://app.sbismart.com/sslwebservices/ssl.asmx?WSDL");
+	   try {
+		   $strWeather1 = $client1->LeadStatus(array('MobileNo'=>$_POST['phone_no']))->LeadStatusResult;
+		   $response1 = $strWeather1->any;
+		   $xml = new SimpleXMLElement($response1);
+		   if($xml->RecordFound=='True'){
+				  $leadstatus = $xml->Status;
+				  $message = 'Your lead status is ' . $leadstatus . '.';
+				  $status = 'status';
+			} else{
+				$message = 'You have entered wrong details! Please try again or contact our customer care executive.';
+				$status = 'error';
+			}
+        }
+		catch (SoapFault $ex){
+				$message = "Some error occured. Please try again.";
+				$status = 'error';
+		}
+	drupal_set_message($message,$status);
+}
+
+function internet_banking_service_tracker_form($form, &$form_state){
+  $form['clicode'] = array(
+	'#type' => 'textfield',
+	'#title' => t('Client Code'),
+	'#required' => TRUE,
+  );
+  $form['accno'] = array(
+	'#type' => 'textfield',
+	'#title' => t('Bank Account No'),
+	'#description' => '<span style = "color:red">(Kindly add 000000 before your Bank Account Number)</span>',
+	'#required' => TRUE,
+  );
+  $form['submit'] = array(
+    '#type' => 'submit',
+    '#value' => t('submit'),
+  );
+  return $form;
+}
+function internet_banking_service_tracker_form_validate($form, &$form_state){
+	if(!empty($form_state['values']['clicode'])){
+        if(ctype_alpha($form_state['values']['clicode']) || !ctype_alnum($form_state['values']['clicode'])){  	
+            form_set_error('clicode', 'Client code should be either numeric or alpha-numeric.');
+        }
+	}
+}
+function internet_banking_service_tracker_form_submit($form, &$form_state){
+		
+	if(!empty($_POST['clicode']) && !empty($_POST['accno'])) {
+		  # Do some SOAP / Call a Web Service
+			   try {
+				   $client = new SoapClient("https://app.sbismart.com/sslwebservices/ssl.asmx?WSDL");
+				   $strWeather = $client->INBCheck(array('ClientCode'=>$_POST['clicode'],'BackAccountNo' => $_POST['accno'], 'User' => 'SBISMART', 'Pin' => '0E9651E1-FF51-47DE-926E-B613048310CF'))->INBCheckResult;
+				   $response = $strWeather->any;
+				   $xml = new SimpleXMLElement($response);
+				   if($xml->INBENABLED == 'True'){
+							$accstatus = $xml->AccountStatus;
+							$message = '<div style="font-weight: bold;color:green;">Internet Banking (INB) service is enabled for your account.  Click on the "Lien / Unlien" option to transfer funds from / to your bank account</div>';
+							$status = 'status';
+					} else{
+							$message = '<div style="font-weight: bold;color:red;">Internet Banking (INB) service is not enabled for your account. Request you to contact your Home Branch for the activation of the same in order to Lien / Unien funds from your bank account</div>';
+							$status = 'error';
+					}
+				}
+			   catch (SoapFault $ex){
+					$message = "<div style='font-weight: bold;color:red;'>Sorry, Please try again later!</div>";
+					$status = 'error';
+				}
+	}
+	else{
+		 $message = "<div style='font-weight: bold;color:red;'>Please fill in values for both the fields</div>";
+		 $status = 'error';
+	}
+	drupal_set_message($message, $status);
+}

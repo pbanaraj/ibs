@@ -1,0 +1,7 @@
+<?php
+/**
+ * @file
+ * Code for the SBI TV Commercials feature.
+ */
+
+include_once 'feature_sbi_tv_commercials.features.inc';

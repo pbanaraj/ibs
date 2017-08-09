@@ -1,0 +1,10 @@
+; $Id: tokenSTARTER.info,v 1.1.2.1 2016/02/10 21:31:24 greggles Exp $
+name = Sbicap Tools
+description = For Tools under educaiton.
+core = 7.x
+
+; Information added by drupal.org packaging script on 2009-06-01
+version = "7.x-1.10"
+core = "7.x"
+project = "sbicap_tools"
+package = SBICAP

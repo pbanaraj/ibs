@@ -1,0 +1,4 @@
+name = SBI Notifications
+description = Implementation on Notifications
+core = 7.x
+package = SBICAP

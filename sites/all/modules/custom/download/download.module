@@ -1,0 +1,92 @@
+<?php
+/**
+ * @file
+ * Download related functionalities.
+ */
+ 
+ /*
+  * HOOK_MENU() Implement
+  */
+function download_menu(){
+    $items = array();
+  	$items['download/ajax/%'] = array(
+        'title' => 'Get Form Data',
+        'page callback' => 'getDownload',
+        'page arguments' => array(1),
+        'access arguments' => array('access content'),
+        'type' => MENU_SUGGESTED_ITEM,
+    );
+    $items['download/ajax'] = array(
+        'title' => 'Get Form Data',
+        'page callback' => 'getDownload',
+        'page arguments' => array(1),
+        'access arguments' => array('access content'),
+        'type' => MENU_SUGGESTED_ITEM,
+    );
+  
+    return $items;
+}
+
+function getDownload(){
+	print views_embed_view('forms_and_software', $display_id = 'form_block');
+}
+
+/**
+ * Implements hook_block_info().
+ */
+function download_block_info() {
+  $blocks = array();
+  $blocks['download_page'] = array(
+    'info' => t('Download page content'),
+    'visibility' => BLOCK_VISIBILITY_LISTED,
+    'pages' => 'downloads',
+    'region' => 'content',
+  );  
+  
+  return $blocks;
+}
+
+/**
+ * Implements hook_block_view().
+ */
+function download_block_view($delta = '') {
+  $block = array();
+
+  switch ($delta) {
+    case 'download_page':
+      $block['content'] = theme('get_download_content');
+      break;
+  }
+  return $block;
+}
+
+/**
+ * Implements hook_theme().
+ */
+function download_theme($existing, $type, $theme, $path) {
+  global $base_url;
+  if (drupal_match_path(drupal_get_path_alias(), 'download')) {
+    
+  }
+  $module_path = $base_url . '/' . drupal_get_path('module', 'download');
+  return array(
+    'get_download_content' => array(
+      'variables' => array(),
+      'template' => 'theme/download'
+    ),
+  );
+}
+
+
+function download_views_query_alter(&$view, &$query) {
+
+  if($view->name == 'forms_and_software') {
+    if(($query->where[1]['conditions'][2]['value'] == 'forms') && (arg(2) != '') && (arg(0) == 'download')){
+    	$query->where[1]['conditions'][] = array(
+        	'field' => 'node.title',
+        	'value' => '%'.arg(2).'%',
+        	'operator' => 'LIKE',
+        );//echo '<pre>'; print_r($query);exit;
+    }
+  }
+}

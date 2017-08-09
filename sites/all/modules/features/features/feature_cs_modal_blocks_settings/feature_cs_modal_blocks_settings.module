@@ -1,0 +1,7 @@
+<?php
+/**
+ * @file
+ * Code for the Feature customer service and modal blocks settings feature.
+ */
+
+include_once 'feature_cs_modal_blocks_settings.features.inc';

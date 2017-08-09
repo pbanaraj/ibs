@@ -1,0 +1,182 @@
+<?php
+
+/**
+ * Implementation of hook_menu().
+ */
+
+function sbicap_tools_menu(){
+    $items = array();
+	$items['education/tools/%'] = array(
+	'title' => 'Tools',
+	'page callback' => 'sbicap_tools',
+	'access callback' => TRUE,
+	'type' => MENU_CALLBACK,    //whatever access rules you have for this menu item.
+	);
+	$items['education/sbicap_tools_form'] = array(
+	'title' => 'Tools',
+	'page callback' => 'sbicap_tools_form',
+	'access callback' => TRUE,
+	'type' => MENU_CALLBACK,    //whatever access rules you have for this menu item.
+	);
+	$items['popup/education/tools_popup/%'] = array(
+	'title' => 'Tools',
+	'page callback' => 'sbicap_tools_popup',
+	'access callback' => TRUE,
+	'type' => MENU_CALLBACK,    //whatever access rules you have for this menu item.
+	);
+	return $items;
+}
+
+
+function sbicap_tools() {
+	global $user;
+        global $base_url;    
+$path = drupal_get_path('module', 'sbicap_tools');
+	drupal_add_js($path . '/sbicap_tools.js', 'module');
+	$node_id= arg(2);
+	$node_details= node_load($node_id);
+	$customer_type = array();
+	$i = 0;
+	foreach($node_details->field_tools_customer_segme as $customer_segment) {
+		$customer_type[$i] = $customer_segment['value'];
+		$i++;
+	}
+	
+		if ($user->uid != '') {
+		if ((in_array($user->roles[2], $customer_type)) || (in_array('All customer',$customer_type))) {
+			drupal_goto($base_url."/tools/".$node_id);	
+		}
+		else {
+			$final = "<div id='client_invite' style='display:none;'>" .$node_id."</div>";
+		}			
+		} 	else {
+		if ((in_array('All Anonymous',$customer_type)) || (in_array('All customer',$customer_type)))
+		{
+		    drupal_goto($base_url."/tools/".$node_id);	
+		}
+		else { 
+		
+			$final = "<div id='client_invite' style='display:none;'>" .$node_id."</div>";
+		} 
+	}
+return $final;	
+}
+
+function sbicap_tools_form() {
+        global $base_url;
+	$path = drupal_get_path('module', 'sbicap_tools');
+	drupal_add_js($path . '/sbicap_tools.js', 'module');
+	if(!empty($_POST)) {
+		$content_id =  $_POST['content_id'];
+		if(($_POST['phone_number'] != '') && ($_POST['email_id'] == '')) {
+			 $query= "Select  * from {sbicap_education_invites_refferals} WHERE invite_Source = '".$_POST['content_id']."' and invite_mobilenumber = '".$_POST['phone_number']."'";
+		}
+		else if(($_POST['email_id'] != '') && ( ($_POST['phone_number'] ==''))) {
+			 $query= "Select * from {sbicap_education_invites_refferals} WHERE invite_Source = '".$_POST['content_id']."' and invite_email = '".$_POST['email_id']."'";
+		}
+		else if(($_POST['phone_number']!='') && ($_POST['email_id']!='')) {
+			 $query= "Select * from {sbicap_education_invites_refferals} WHERE invite_Source = '".$_POST['content_id']."' and invite_email = '".$_POST['email_id']."' and invite_mobilenumber = '".$_POST['phone_number']."'";	
+		}
+		$res = db_fetch_object(db_query($query));
+		if(empty($res)) {
+			echo "<script language='javascript'>";
+			echo "var url='".$base_url."/education/sorry/tools/".$_POST['content_id']."';";
+			echo "window.opener.location.href = url;";
+			echo "self.close();";
+			echo "</script>";
+		}
+		else {
+			echo "<script language='javascript'>";
+			echo "var url='".$base_url."/tools/".$_POST['content_id']."';";
+			echo "window.opener.location.href = url;";
+			echo "self.close();";
+			echo "</script>";
+		}
+	}
+		return $final;
+}
+
+function sbicap_tools_popup() {
+	$path = drupal_get_path('module', 'sbicap_tools');
+	drupal_add_js($path . '/sbicap_tools.js', 'module');
+	
+	$final = "<div id='thickbox_wrap'><form name='contactusemail' id='contactusemail' method='post' action='?q=education/sbicap_tools_form' onsubmit='return validateform();'>";
+	$final .= "<h3>Check Invitees Form</h3>";
+	$final .= "<h5>Please Enter your Details Below:</h5>";
+	$final .= "<input type='hidden' name='content_id' value=".arg(3)."/>";
+	$final .= "<div><label>Phone Number:</label> <input type= 'textbox' name='phone_number' id='phone_number' value='' /></div>";
+	$final .= "<h5>OR</h5>";
+	$final .= "<div><label>Email Id:</label><input type='textbox' name='email_id' id='emailID' value='' /></div>";
+	$final .= "<input class='submit-btn' type ='submit' name='submit' value='submit' />";
+	$final .= "</form></div>";
+	return $final;
+}
+
+function sbicap_tools_nodeapi(&$node, $op, $a3 = NULL, $a4 = NULL) {
+	 switch ($op) {
+	case 'insert':
+    case 'update':
+	$field = $node->field_tools_invitees;
+	
+		if($field[0]['filename']!='')
+		{
+			if (($handle = fopen($field[0]['filepath'], "r")) !== FALSE) {
+			$row = 0;
+			while (($data[$row] = fgetcsv($handle, 1000, ",")) !== FALSE) {
+				$row++;
+			}
+			$i = 1;
+			
+			for($i= 1;$i<count($data);$i++) {
+				if(!empty($data[$i][1])) {
+					$res= db_fetch_object((db_query("select * from {sbicap_education_invites_refferals} where invite_name = '".$data[$i][1]."' and invite_email = '".$data[$i][2]."' and invite_source = '".$node->nid."'")));
+					if(empty($res)) {
+						db_query("INSERT INTO {sbicap_education_invites_refferals} (invite_name, invite_email, invite_mobilenumber, invite_pincode, invite_source, invite_ref_id) VALUES ('".$data[$i][1]."','".$data[$i][2]."', '".$data[$i][3]."', '".$data[$i][4]."', '".$node->nid."', '".$vars['user']->uid."')");
+					}	
+			 }  
+			} 
+		 }
+	}
+	break;
+}
+}
+
+/**
+ * Implements hook_block_info().
+ */
+function sbicap_tools_block_info() {
+  $blocks = array();
+  $blocks['education_tools'] = array(
+    'info' => t('Education Tools'),
+    'visibility' => BLOCK_VISIBILITY_LISTED,
+    'pages' => 'education/tools',
+    'region' => 'content',
+  );
+  return $blocks;
+}
+
+/**
+ * Implements hook_block_view().
+ */
+function sbicap_tools_block_view($delta = '') {
+  $block = array();
+
+  switch ($delta) {
+    case 'education_tools':
+      $block['content'] = theme('get_sbicap_tools_content');
+      break;
+  }
+  return $block;
+}
+
+/**
+ * Implements hook_theme().
+ */
+function sbicap_tools_theme($existing, $type, $theme, $path) {
+  return array(
+    'get_sbicap_tools_content' => array(
+      'variables' => array(),
+      'template' => 'templates/education-tools'
+    ),
+  );
+}

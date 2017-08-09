@@ -1,0 +1,100 @@
+<?php
+require_once dirname(__FILE__).'/include/news.inc';
+require_once dirname(__FILE__).'/include/views.inc';
+require_once dirname(__FILE__).'/include/mcxrate.inc';
+require_once dirname(__FILE__).'/include/international_market.inc';
+require_once dirname(__FILE__).'/include/reference_rates.inc';
+
+/*
+ * HOOK_MENU() Implement
+ */
+function market_menu(){
+	$items = array();
+	$items['markets/analysis/news'] = array(
+		'title' => 'Views',
+		'page callback' => 'refresh_marketsnews',
+		'access callback' => TRUE,
+		'type' => MENU_CALLBACK,
+	);
+	$items['markets/analysis/views'] = array(
+		'title' => 'Views',
+		'page callback' => 'refresh_marketsviews',
+		'access callback' => TRUE,
+		'type' => MENU_CALLBACK,
+	);
+	$items['markets/analysis/mcxrate'] = array(
+		'title' => 'Views',
+		'page callback' => 'refresh_marketsmcxrates',
+		'access callback' => TRUE,
+		'type' => MENU_CALLBACK,
+	);
+	$items['markets/currencies/international_markets'] = array(
+		'title' => 'International markets',
+		'page callback' => 'refresh_marketsintrnmarkets',
+		'access callback' => TRUE,
+		'type' => MENU_CALLBACK,
+	);
+	$items['markets/currencies/reference_rates'] = array(
+		'title' => 'Reference Rates',
+		'page callback' => 'refresh_marketsrefrates',
+		'access callback' => TRUE,
+		'type' => MENU_CALLBACK,
+	);
+	
+	return $items;
+}
+
+/**
+* Implements hook_block_info().
+*/
+function market_block_info() {
+  $blocks = array();
+  $blocks['market_news'] = array(
+    'info' => t('Market Page NEWS'),
+  );
+  $blocks['market_views'] = array(
+  		'info' => t('Market Page Views'),
+  );
+  $blocks['market_mcxrate'] = array(
+  		'info' => t('Market Mcx Rate'),
+  );
+  $blocks['international_market'] = array(
+  		'info' => t('International Market'),
+  );
+  $blocks['reference_rates'] = array(
+  		'info' => t('Reference Rates'),
+  );
+  
+  return $blocks;
+}
+
+/**
+* Implements hook_block_view().
+*/
+function market_block_view($delta = '') {
+  $block = array();
+  switch ($delta) {
+    case 'market_news':
+        $block['subject'] = '';
+        $block['content'] = getMarketNews();
+        break;
+    case 'market_views':
+      	$block['subject'] = '';
+      	$block['content'] = getMarketViews();
+      	break;
+    case 'market_mcxrate':
+      	$block['subject'] = '';
+      	$block['content'] = getMarketMcxRate();
+      	break;
+    case 'international_market':
+      	$block['subject'] = '';
+      	$block['content'] = getInternationalMarket();
+      	break;
+   case 'reference_rates':
+      	$block['subject'] = '';
+      	$block['content'] = reference_rates();
+      	break;
+  }
+  return $block;
+}
+

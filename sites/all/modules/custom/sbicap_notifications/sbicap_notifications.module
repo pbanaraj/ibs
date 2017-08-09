@@ -1,0 +1,132 @@
+<?php
+
+/**
+ * @file
+ * Implementation on Notifications.
+ */
+/**
+ * Implements hook_menu()
+ */
+function sbicap_notifications_menu() {
+  $items = array();
+  $items['admin/config/user-interface/notifications'] = array(
+    'title' => 'Configure Notification Settings',
+    'description' => 'Configures notification settings.',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('sbicap_notifications_admin_form'),
+    'access arguments' => array('administer content search'),
+    'file' => 'sbicap_notifications.admin.inc',
+    'type' => MENU_NORMAL_ITEM,
+    'weight' => 2,
+  );
+  $items['sbicap_notifications/sbicap_notifications_node'] = array(
+		'title' => 'Views',
+		'page callback' => 'sbicap_notifications_node',
+		'access callback' => TRUE,
+		'type' => MENU_CALLBACK,
+	);
+  return $items;
+}
+
+/**
+ * Implements hook_block_info().
+ */
+function sbicap_notifications_block_info() {
+  $blocks = array();
+  $blocks['sbicap_notifications'] = array(
+    'info' => t('SBICAP Notifications.'),
+  );
+  return $blocks;
+}
+
+/**
+ * Implements hook_block_view().
+ */
+function sbicap_notifications_block_view($delta='') {
+  $block = array();
+
+  switch($delta) {
+    case 'sbicap_notifications' :
+      $block['content'] = _get_sbicap_notifications();
+      break;
+  }
+  return $block;
+}
+
+/**
+ * Implements hook_theme().
+ */
+function sbicap_notifications_theme($existing, $type, $theme, $path) {
+  return array(
+    'sbicap_notifications' => array(
+      'variables' => array(
+        'nodes' => array(),
+      ),
+      'template' => 'templates/sbicap-notifications'
+    ),
+  );
+}
+
+/**
+ * Custom function to place the notification block.
+ */
+function _get_sbicap_notifications() {
+    
+  $notification_settings = array(
+    'global_time' => variable_get('global_time', 0),
+    'item_stay_time' => variable_get('item_stay_time', 0),
+    'items_open_time' => variable_get('items_open_time', 0),
+    'item_speed' => variable_get('item_speed', 0),
+  );
+
+    // Sets the notification settings to drupal settings variable.
+  drupal_add_js(array('sbicap_notifications' => $notification_settings), 'setting');
+  $module_path = drupal_get_path('module', 'sbicap_notifications');
+  drupal_add_js($module_path . '/js/sbicap_notifications.js');
+  
+  $notification_nodes = '';
+  return theme('sbicap_notifications', array('nodes' => $notification_nodes));
+}
+
+/**
+ * Custom function to get all Notification lists.
+ */
+function sbicap_notifications_node() {
+	
+  global $base_url;
+  $search_string = '';  
+  if($_REQUEST["page"] == $base_url)
+	  $search_string = $_REQUEST["page"];
+  else{	  
+	  $search_string = substr($_REQUEST["page"],strlen($base_url)+1);
+  } 
+  $query = db_select('nodequeue_types', 'nqt');
+  $query->join('nodequeue_nodes', 'nqn', 'nqt.qid = nqn.qid');  
+  $query->fields('nqn', array('sqid'));  
+  $query->condition('nqt.type', 'sbi_notifications');  
+  $sqid = $query->execute()->fetchAssoc();
+  $orderby = "ASC";
+  $query1 = db_select('node', 'n')
+    ->fields('n', array('nid'))
+    ->condition('nn.sqid', $sqid['sqid'])	
+    ->orderBy('nn.position', $orderby)
+    ->addTag('node_access');
+  $query1->join('nodequeue_nodes', 'nn', 'n.nid = nn.nid');  
+  $query1->join('field_data_field_page_url', 'fdfpu', 'fdfpu.entity_id = n.nid');
+  $query1->condition('n.status', 1); 
+  $query1->condition('fdfpu.field_page_url_value', '%'.db_like($search_string).'%', 'LIKE');
+  //$query1->condition('fdfpu.field_page_url_value', $_REQUEST['page']);  
+  $result = $query1->range($_REQUEST['start'], 1)->execute()->fetchCol(); 
+  $notification_nodes = array_values(node_load_multiple($result));
+  
+  if(empty($notification_nodes)){
+	  $resArr['msg'] = "fail";
+	  $resArr['status'] = '201';
+  }else{
+	  $resArr['msg'] = "success";
+	  $resArr['status'] = '200';
+	  $resArr['title'] = $notification_nodes[0]->title;
+	  $resArr['body'] = $notification_nodes[0]->body['und'][0]['value'];
+  }
+  print json_encode($resArr);exit;  
+}

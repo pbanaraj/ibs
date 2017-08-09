@@ -1,0 +1,318 @@
+<?php
+/*
+* Implements hook_menu()
+*/
+function sbicap_feedback_menu() {
+  $items['admin/config/content/feedback/manage'] = array(
+    'title' => t('Feedback configuration'),
+    'page callback' => 'feedbackManage',
+    'access arguments' => array('access content'),
+    'theme callback' => 'sbicap_feedback_theme_callback',
+    'type' => MENU_NORMAL_ITEM
+  );
+  $items['feedback/cron'] = array(
+    'page callback' => 'cronTaskExecute',
+    'access arguments' => array('access content'),
+    'type' => MENU_CALLBACK
+  );
+  return $items;
+}
+
+/**
+ * Custom callback function to render admin feedback form.
+ * @return form.
+ */
+function feedbackManage() {
+  return theme('feedback_admin',array('data'=>NULL));
+}
+
+/**
+ * Custom callback to change the theme.
+ */
+function sbicap_feedback_theme_callback() {
+  return 'sbicap';
+}
+
+/**
+ * Implements hook_form_alter().
+ */
+function sbicap_feedback_form_alter(&$form, &$form_state, $form_id) {
+  // Checks webforms.
+  if (strpos($form_id, 'webform_client_form') !== FALSE) {
+    // If Maxlength and Webform Validation, it enters into loop.
+    if (module_exists('maxlength') && module_exists('webform_validation')) {
+      // Calls custom function to add max_length.
+      $form['submitted'] = addMaxlengthToTheField($form, $form_id);
+    }
+
+    // Does for only feedback form.
+    if($form_id == "webform_client_form_15") {
+      $form['submitted']['presentation']['#attributes'] = array('rating');
+      $form['feedback_captcha_element'] = array(
+        '#type' => 'captcha',
+        '#captcha_type' => 'default',
+      );
+
+      // Reset button in feedback form.
+      $form['actions']['reset'] = array(
+        '#type' => 'button',
+        '#button_type' => 'reset',
+        '#value' => t('Reset'),
+        '#weight' => 50,
+        '#attributes' => array(
+          'onclick' => 'this.form.reset(); return false;',
+        ),
+      );
+    }
+  }
+  return $form;
+}
+
+function feedback_admin_form() {
+  module_load_include('inc', 'webform', 'includes/webform.export');
+  module_load_include('inc', 'webform', 'includes/webform.components');
+  $form = array();
+  $node = node_load(15);
+  $form['#attached']['js'][] = drupal_get_path('module', 'webform') . '/js/webform-admin.js';
+
+  // If an export is waiting to be downloaded, redirect the user there after
+  // the page has finished loading.
+  if (isset($_SESSION['webform_export_info'])) {
+    $download_url = url('node/' . $node->nid . '/webform-results/download-file', array('absolute' => TRUE));
+    $form['#attached']['js'][] = array('data' => array('webformExport' => $download_url), 'type' => 'setting');
+  }
+
+  $form['feedback_toaddress'] = array(
+    '#title'=>'To address',
+    '#type'=>'textfield', 
+    '#attributes'=>array('placeholder'=>'Comma separated email address'),
+    '#default_value' => variable_get('feedback_toaddress')
+  );
+
+  $form['feedback_scheduler'] = array(
+      '#type' => 'radios',
+      '#title' => t('Schedule Cron'),
+      '#description' => t('Cron Scheduler'),
+      '#options' => array('Daily'=>'Daily','Weekly'=>'Weekly'),
+      '#default_value'=> variable_get('feedback_scheduler')
+  );
+  $form['feedback_week'] = array(
+      '#type' => 'select',
+      '#options' => array('Sunday','Monday','Tuesday','Wednesday','Thrusday','Friday','Saturday'),
+      '#title' => 'select a Weekday',
+      '#states' => array(
+        'visible' => array(':input[name="feedback_scheduler"]' => array('value' => 'Weekly')),
+      ),
+      '#default_value' => variable_get('feedback_week')
+  );
+  $form['feedback_cron_hrs']  = array(
+    '#type'=> 'select',
+    '#title'=>'Cron hours',
+    '#options' => array(0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23),
+    '#default_value' => variable_get('feedback_cron_hrs')
+  );
+  $form['feedback_cron_minutes']  = array(
+    '#type'=> 'textfield',
+    '#title'=>'Cron minutes',
+    '#default_value' => variable_get('feedback_cron_minutes')
+  );
+  $form['feedback_download_range'] = array(
+    '#type' => 'radios',
+    '#title' => t('Download Range'),
+    '#description' => t('Download Range options'),
+    '#options' => array('all'=>'All submissions','new'=>'Only new submissions since your last export'),
+    '#default_value' => variable_get('feedback_download_range')
+  );
+  /* $form['save'] = array(
+    '#type' =>'submit',
+    '#value' => 'Save',
+  );
+  $form['cancel'] = array(
+    '#type' => 'button',
+    '#value' => 'Cancel',
+   );*/
+  return system_settings_form($form);
+}
+
+function feedback_admin_form_validate(&$form, &$form_state){
+  if(!is_numeric($form_state['values']['feedback_cron_minutes'])){
+    drupal_set_message('Not a valid Cron Minutes','error');
+  } else if($form_state['values']['feedback_cron_minutes'] > 59 || $form_state['values']['feedback_cron_minutes'] < 0){
+    drupal_set_message('Please enter the Cron minutes between 0 and 59','error');
+  }
+}
+
+/**
+ * Implements hook_form_submit().
+ * @param Array $form
+ * @param Array $form_state
+ */
+function feedback_admin_form_submit(&$form, &$form_state) {
+ $minutes = empty($form_state['values']['feedback_cron_minutes'])?0:$form_state['values']['feedback_cron_minutes'];
+ if($form_state['values']['scheduler'] == "Daily") {
+    $string = $minutes.' '.$form_state['values']['feedback_cron_hrs'].' * * *';
+ } else {
+    $string = $minutes.' '.$form_state['values']['feedback_cron_hrs'].' * * '.$form_state['values']['feedback_week'];
+ }
+ variable_set('feedback_cron_string',$string);
+}
+
+function sbicap_feedback_cronapi($op, $job = NULL) {
+  $items['feedback_cron'] = array(
+    'description' => 'Send mail with feedback attachment',
+    'rule' => variable_get('feedback_cron_string'),
+    'callback' => 'cronTaskExecute',
+  );
+  return $items;
+}
+
+/**
+ * cron callback funtion.
+ */
+function cronTaskExecute() {
+
+  module_load_include('inc', 'webform', 'includes/webform.report');
+  module_load_include('inc', 'webform', 'includes/webform.export');
+  module_load_include('inc', 'webform', 'includes/webform.components');
+  
+  $result = db_query("SELECT n.nid FROM {node} n WHERE n.title = :title AND n.type = :type", array(":title"=> 'Feedback', ":type"=> 'webform'));  
+  $nid = $result->fetchField();
+  $node = node_load($nid);
+  $format = 'excel';
+  $components = array ( 0 => 'info', 1 => 'webform_serial', 2 => 'webform_sid', 3 => 'webform_time', 4 => 'webform_completed_time', 5 => 'webform_modified_time' , 6 => 'webform_draft', 7  => 'webform_ip_address', 8 => 'webform_uid', 9 => 'webform_username', 10 => 1 ,11 => 2 ,12 => 3, 13 => 4 ,14 => 8, 15 => 6, 16 => 7, 17 => 11, 18 => 9,19 => 10, 20 => 5, 21 => 12, 22 => 13, 23 => 14, 24 => 15, 25 => 16, 26 => 17 ); 
+  $options = array(
+    'delimiter' =>'',
+    'components' => $components,
+    'header_keys' => 0,
+    'select_keys' => 0,
+    'select_format' => 'separate',
+    'range' => array( 'range_type' => variable_get('feedback_download_range')),
+    'download' =>TRUE,
+    'savetodrive'=>1,
+  );
+
+  $defaults = webform_results_download_default_options($node, $format);
+  $options += $defaults;
+  $options['range'] += $defaults['range'];
+
+  // Determine an appropriate batch size based on the form and server specs.
+  if (!isset($options['range']['batch_size'])) {
+    $options['range']['batch_size'] = webform_export_batch_size($node);
+  }
+
+  $options['file_name'] = _webform_export_tempname();
+  $batch = webform_results_export_batch($node, $format, $options);
+  
+  batch_set($batch);
+  $batch =& batch_get();
+  $batch['progressive'] = FALSE;
+  $batch['sets'][0]['finished'] = 'sbicap_feedback_batch_finished';
+  batch_process();
+
+  $attachment = array(
+    'filepath' => drupal_realpath('public://')."/feedback.xlsx"
+  );
+
+  $params = array(
+    'key' => 'my_email_template',
+    'to' => variable_get('feedback_toaddress'),
+    'from' => variable_get('site_mail', ''),
+    'subject' => 'Feedback submissions',
+    'body' => 'Automated mail of feedback submissions',
+    'attachment' => $attachment
+  );
+  drupal_mail('sibcap_feedback','my_email_template', variable_get('feedback_toaddress'), 'en', $params,variable_get('site_mail', ''));
+}
+
+function sbicap_feedback_batch_finished ($success, $results, $operations) {
+  if ($success) {
+    $export_info = $_SESSION['webform_export_info'];
+    if(isset($export_info['options']['savetodrive'])) {
+      if($export_info['options']['savetodrive']) {
+          $fileContents = file_get_contents($export_info['file_name']);
+          $filename = drupal_realpath('public://')."/feedback.xlsx";
+          $fh = fopen($filename, 'w+');
+          fputs($fh, $fileContents);
+          fclose($fh);
+      }
+    }
+  }
+}
+
+/**
+ * Implements hook_mail().
+ */
+function sbicap_feedback_mail($key, &$message, $params) {
+  $message['subject'] = $params['subject'];
+  $message['body'][] = $params['body'];
+
+  // Add attachment when available.
+  if (isset($params['attachment'])) {
+    $message['params']['attachments'][] =  $params['attachment'];
+  }
+}
+
+/**
+ * Implements hook_theme().
+ */
+function sbicap_feedback_theme($existing, $type, $theme, $path) {
+  $theme = array();
+  $theme['feedback_admin'] = array(
+    'template' => 'feedbackadmin',
+    'render element' => 'form',
+    'path' => drupal_get_path('module', 'sbicap_feedback') . '/templates',
+    'arguments' => array('data' => null),
+   );
+  return $theme;
+}
+
+/**
+ * Custom function to add max_length for textarea/textfields fields.
+ */
+function addMaxlengthToTheField($form, $form_id) {
+  // Collects nid.
+  $nid = substr($form_id, strlen('webform_client_form') + 1);
+  // $node = node_load($nid);
+  // $values = isset($form_state['values']['submitted']) ? $form_state['values']['submitted'] : NULL;
+  // $flat_values = _webform_client_form_submit_flatten($node, $values);
+  // Collects Webform Validation rules.
+  $rules = webform_validation_get_node_rules($nid);
+  // If rules avaliables.
+  if ($rules) {
+    foreach ($rules as $ruleid => $rule) {
+      // Filter out rules that don't belong in the current step.
+      if ($rule['validator'] == 'max_length') {
+        // Collects length limit.
+        $length_limit = $rule['data'];
+        // Components.
+        $components = $rule['components'];
+        foreach ($components as $cid => $component) {
+          // Form ID.
+          $form_key = $component['form_key'];
+          $counter = 0;
+          foreach ($form['submitted'] as $fieldsetkey => $fieldset) {
+            // Skips $form[#tree] index from the result set.
+            if ($counter != 0) {
+              // One level fieldset.
+              if (isset($fieldset['#type']) && $fieldset['#type'] == 'fieldset') {
+                $form['submitted'][$fieldsetkey][$form_key]['#maxlength'] = $length_limit;
+                $form['submitted'][$fieldsetkey][$form_key]['#maxlength_js'] = TRUE;
+                // Adds Max: 1000 characters and Left: 1000 character(s) string below the textareas.
+                $form['submitted'][$fieldsetkey][$form_key]['#attributes']['maxlength_js_label'] = '<div class="webform-maxlength"><span class="max-limit-desc">Max: <em>' . $length_limit . '</em> characters.</span><span class="max-limit-left">Left: <em>@remaining</em> character(s).</span></div>';
+              }
+              else {
+                // Without fieldset.
+                $form['submitted'][$form_key]['#maxlength'] = $length_limit;
+                $form['submitted'][$form_key]['#maxlength_js'] = TRUE;
+                // Adds Max: 1000 characters and Left: 1000 character(s) string below the textareas.
+                $form['submitted'][$form_key]['#attributes']['maxlength_js_label'] = '<div class="webform-maxlength"><span class="max-limit-desc">Max: <em>' . $length_limit . '</em> characters.</span><span class="max-limit-left">Left: <em>@remaining</em> character(s).</span></div>';
+              }
+            }
+            $counter++;
+          }
+        }
+      }
+    }
+  }
+  return $form['submitted'];
+}
